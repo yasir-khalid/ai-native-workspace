@@ -1,0 +1,30 @@
+{
+  "manifest": {
+    "schema_version": "1.0",
+    "agent_id": "catalyst-monitor",
+    "name": "Catalyst Monitor",
+    "description": "Background agent that watches the pod's universe for new filings and catalysts, raises alerts and requests PM sign-off on briefs.",
+    "owner_team": "research-ai",
+    "implementation_version": "1.0.0",
+    "capabilities": [
+      "research.search"
+    ],
+    "allowed_tools": [
+      "research.search",
+      "events.emit"
+    ],
+    "data_classification_ceiling": "pod_confidential",
+    "publication_status": "ga",
+    "supported_run_modes": [
+      "background",
+      "scheduled"
+    ],
+    "deployment": {
+      "protocol": "a2a",
+      "service_ref": "agent://catalyst-monitor/1.0.0",
+      "runtime_timeout_seconds": 60
+    },
+    "health_endpoint_ref": "agent://catalyst-monitor/1.0.0#card"
+  },
+  "kind": "background"
+}

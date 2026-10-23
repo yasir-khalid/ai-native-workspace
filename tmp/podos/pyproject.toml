@@ -1,0 +1,58 @@
+[project]
+name = "podos"
+version = "0.1.0"
+description = "PodOS: AI-native research workspace POC (pod-isolated, centrally governed agents)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "pydantic>=2.8",
+  "psycopg[binary,pool]>=3.2",
+  "httpx>=0.27",
+  "pyjwt>=2.9",
+  "jsonschema>=4.23",
+  "openfeature-sdk>=0.8",
+  "python-pptx>=1.0",
+  "python-docx>=1.1",
+  "google-adk[a2a]>=2.11",
+  "minio>=7.2.20",
+  "mcp>=1.20",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+  "pytest-asyncio>=0.24",
+  "ruff>=0.6",
+  "jiwer==4.0.0",
+  "whisper-normalizer==0.1.15",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+  "packages/contracts/podos_contracts",
+  "apps/api/podos_api",
+  "agents/podos_agents",
+  "workers/podos_worker",
+  "connectors/podos_connectors",
+  "evals/podos_evals",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+filterwarnings = ["ignore::UserWarning", "ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "B008"]

@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "agent_id": "esg-screener",
+  "name": "ESG Screener",
+  "description": "Screens issuers for ESG controversies and governance red flags in the pod vault and summarises controversy exposure.",
+  "owner_team": "sustainability-ai",
+  "implementation_version": "1.0.0",
+  "deployment": {
+    "protocol": "a2a",
+    "service_ref": "agent://esg-screener/1.0.0",
+    "runtime_timeout_seconds": 60
+  },
+  "capabilities": [
+    "research.search"
+  ],
+  "allowed_tools": [
+    "research.search"
+  ],
+  "data_classification_ceiling": "pod_confidential",
+  "publication_status": "draft",
+  "supported_run_modes": [
+    "interactive"
+  ]
+}

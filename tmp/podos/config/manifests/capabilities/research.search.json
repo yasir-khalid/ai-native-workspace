@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "capability_id": "research.search",
+  "description": "Search the active pod's private research index.",
+  "side_effect_class": "read_only",
+  "result_type": "json",
+  "owner_team": "ai-platform",
+  "implementation": {
+    "protocol": "python_internal",
+    "service_ref": "workspace-api",
+    "operation": "search"
+  },
+  "input_schema_ref": "podos_contracts.models.search",
+  "requires_approval": false,
+  "supports_idempotency": true,
+  "default_timeout_seconds": 30
+}

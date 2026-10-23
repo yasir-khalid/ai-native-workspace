@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/agent-manifest.schema.json",
+  "title": "AgentManifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "agent_id",
+    "name",
+    "owner_team",
+    "implementation_version",
+    "deployment",
+    "capabilities",
+    "data_classification_ceiling"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "agent_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9.-]{2,63}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "owner_team": {
+      "type": "string",
+      "minLength": 2
+    },
+    "implementation_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol",
+        "service_ref"
+      ],
+      "properties": {
+        "protocol": {
+          "enum": [
+            "a2a",
+            "local_adk"
+          ]
+        },
+        "service_ref": {
+          "type": "string",
+          "minLength": 2
+        },
+        "agent_card_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "image_digest": {
+          "type": "string"
+        },
+        "runtime_timeout_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600
+        },
+        "trust": {
+          "enum": [
+            "platform",
+            "external"
+          ]
+        },
+        "stream_profile": {
+          "enum": [
+            "podos",
+            "a2a"
+          ]
+        },
+        "auth_secret_ref": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_.-]+$"
+      }
+    },
+    "allowed_tools": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "data_classification_ceiling": {
+      "enum": [
+        "public",
+        "internal",
+        "pod_confidential",
+        "restricted"
+      ]
+    },
+    "publication_status": {
+      "enum": [
+        "draft",
+        "validating",
+        "approved",
+        "pilot",
+        "ga",
+        "deprecated",
+        "retired"
+      ]
+    },
+    "supported_run_modes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "interactive",
+          "background",
+          "scheduled"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "health_endpoint_ref": {
+      "type": "string"
+    }
+  }
+}

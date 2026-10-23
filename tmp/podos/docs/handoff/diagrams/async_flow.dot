@@ -1,0 +1,14 @@
+digraph flow {
+ graph [rankdir=TB,bgcolor=white,pad=.18,ranksep=.32,nodesep=.26,fontname="DejaVu Sans",splines=ortho];
+ node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,color="#9db1c9",fillcolor="#f4f7fb",fontcolor="#1b3048",margin=".17,.11"];
+ edge [color="#557ca5",penwidth=1.1,arrowsize=.7];
+ event[label="Monitor / schedule\nor external trigger"];
+ run[label="Pod-scoped ADK\nbackground run"];
+ ingress[label="Authenticated\nagent event ingress"];
+ persist[label="Atomic DB transaction\nWork item + outbox",fillcolor="#dfeafb"];
+ notify[label="Worker delivers\ninbox notification"];
+ action[label="PM reviews evidence\nand submits decision",fillcolor="#e5f3e9"];
+ check[label="Recheck pod, approver,\nversion + expiry"];
+ resume[label="Idempotent workflow\nresume / completion",fillcolor="#e2f3e8"];
+ event -> run -> ingress -> persist -> notify -> action -> check -> resume;
+}

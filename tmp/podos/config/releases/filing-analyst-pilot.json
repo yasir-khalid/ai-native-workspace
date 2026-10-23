@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "revision": "2026-10-11.1",
+  "release_key": "filing-analyst-pilot",
+  "kind": "agent",
+  "agent_id": "filing-analyst",
+  "agent_version": "1.0.0",
+  "stage": "POD_PILOT_DIRECT",
+  "published": true,
+  "pod_allowlist": [
+    "pod_alpha"
+  ],
+  "eligible_groups": [
+    "research_users"
+  ],
+  "feature_flags": {
+    "catalogue_visible": true,
+    "direct_invoke": true,
+    "auto_route": false,
+    "background_execution": false,
+    "proactive_alerts": false,
+    "capability_enabled": false,
+    "emergency_disabled": false
+  },
+  "user_fraction_percent": 100,
+  "stable_salt_id": "filing-analyst-pilot-2026q4",
+  "runtime_canary": {
+    "stable_version": "1.0.0",
+    "candidate_version": "1.1.0",
+    "candidate_fraction_percent": 0
+  },
+  "notes": "Agent B: pilot with Pod Alpha, direct selection only"
+}

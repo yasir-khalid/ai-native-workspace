@@ -1,0 +1,5 @@
+[
+  {"dataset_id": "sec-edgar", "name": "SEC EDGAR filings", "description": "8-K, 10-Q, 10-K and Form 4 filings for watched tickers.", "source": "mcp://edgar", "classification": "public", "licence": "Public domain (SEC)"},
+  {"dataset_id": "market-news", "name": "Market news", "description": "Licensed newswire headlines for watched tickers.", "source": "mcp://news", "classification": "internal", "licence": "Vendor licence (per pod)"},
+  {"dataset_id": "earnings-transcripts", "name": "Earnings call transcripts", "description": "Call transcripts and prepared remarks.", "source": "mcp://transcripts", "classification": "internal", "licence": "Vendor licence (per pod)"}
+]

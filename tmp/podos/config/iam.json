@@ -1,0 +1,24 @@
+{
+  "_comment": "Mock firm IdP/IAM directory. In production this is sourced from OIDC/Entra groups. Pod membership here is authoritative; UI pod selection never grants access.",
+  "pods": [
+    {"pod_id": "pod_alpha", "display_name": "Alpha Capital", "strategy": "TMT long/short equity", "accent": "indigo"},
+    {"pod_id": "pod_beta", "display_name": "Beta Partners", "strategy": "Healthcare event-driven", "accent": "emerald"}
+  ],
+  "users": [
+    {"subject_id": "alice.chen", "display_name": "Alice Chen", "email": "alice.chen@fund.example", "title": "Portfolio Manager", "platform_roles": [],
+     "memberships": [{"pod_id": "pod_alpha", "pod_role": "pm", "groups": ["research_users", "deck_builders", "approvers"]}]},
+    {"subject_id": "arjun.patel", "display_name": "Arjun Patel", "email": "arjun.patel@fund.example", "title": "Senior Analyst", "platform_roles": [],
+     "memberships": [{"pod_id": "pod_alpha", "pod_role": "analyst", "groups": ["research_users", "deck_builders"]}]},
+    {"subject_id": "bianca.rossi", "display_name": "Bianca Rossi", "email": "bianca.rossi@fund.example", "title": "Portfolio Manager", "platform_roles": [],
+     "memberships": [{"pod_id": "pod_beta", "pod_role": "pm", "groups": ["research_users", "deck_builders", "approvers"]}]},
+    {"subject_id": "ben.okafor", "display_name": "Ben Okafor", "email": "ben.okafor@fund.example", "title": "Analyst", "platform_roles": [],
+     "memberships": [{"pod_id": "pod_beta", "pod_role": "analyst", "groups": ["research_users"]}]},
+    {"subject_id": "dana.kim", "display_name": "Dana Kim", "email": "dana.kim@fund.example", "title": "Shared Data Analyst", "platform_roles": [],
+     "memberships": [
+       {"pod_id": "pod_alpha", "pod_role": "analyst", "groups": ["research_users"]},
+       {"pod_id": "pod_beta", "pod_role": "analyst", "groups": ["research_users"]}
+     ]},
+    {"subject_id": "pat.morgan", "display_name": "Pat Morgan", "email": "pat.morgan@fund.example", "title": "Platform Engineer", "platform_roles": ["platform_admin"],
+     "memberships": []}
+  ]
+}

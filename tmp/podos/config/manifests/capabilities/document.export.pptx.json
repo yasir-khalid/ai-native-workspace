@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "capability_id": "document.export.pptx",
+  "description": "Render a typed DocumentSpec to a pod-private PowerPoint deck.",
+  "side_effect_class": "local_artifact",
+  "result_type": "artifact",
+  "owner_team": "ai-platform",
+  "implementation": {
+    "protocol": "python_internal",
+    "service_ref": "capability-documents",
+    "operation": "render_pptx"
+  },
+  "input_schema_ref": "podos_contracts.models.DocumentSpec",
+  "requires_approval": false,
+  "supports_idempotency": true,
+  "default_timeout_seconds": 30
+}

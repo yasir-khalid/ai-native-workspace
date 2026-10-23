@@ -1,0 +1,108 @@
+/* Light colour system: a blend of Linear (structure, hairlines, indigo accent), Grok (stark near-black
+ * ink) and ChatGPT (clean white canvas, soft neutral fills).
+ *
+ * Each hue is ONE base colour; lower-numbered steps are that colour at increasing opacity (so they sit
+ * as tints on any surface); higher-numbered steps mix it with the ink colour for readable text. Greys are
+ * the ink colour at opacity. The whole scale is ink-relative: on the light theme `--color-ink` is the
+ * near-black text colour, so greys read dark-on-light and every hue's 800–1000 steps come out as dark,
+ * readable tints. Flip ink to a near-white to return to a dark theme. */
+@theme {
+  --color-ink: #0d0d0d;
+  --color-gray-50: #0d0d0d05;
+  --color-gray-100: #0d0d0d08;
+  --color-gray-200: #0d0d0d0f;
+  --color-gray-300: #0d0d0d14;
+  --color-gray-400: #0d0d0d20;
+  --color-gray-500: #0d0d0d30;
+  --color-gray-600: #0d0d0d70;
+  --color-gray-700: #0d0d0d8f;
+  --color-gray-800: #0d0d0db0;
+  --color-gray-900: #0d0d0dd0;
+  --color-gray-950: #0d0d0de8;
+  --color-gray-1000: #0d0d0d;
+  --color-blue-50: #035ade05;
+  --color-blue-100: #035ade0a;
+  --color-blue-200: #035ade14;
+  --color-blue-300: #035ade24;
+  --color-blue-400: #035ade38;
+  --color-blue-500: #035ade70;
+  --color-blue-600: #035aded0;
+  --color-blue-700: #035ade;
+  --color-blue-800: color-mix(in oklab, #035ade 82%, #0d0d0d);
+  --color-blue-900: color-mix(in oklab, #035ade 72%, #0d0d0d);
+  --color-blue-950: color-mix(in oklab, #035ade 45%, #0d0d0d);
+  --color-blue-1000: color-mix(in oklab, #035ade 35%, #0d0d0d);
+  --color-green-50: #00bf6f05;
+  --color-green-100: #00bf6f0a;
+  --color-green-200: #00bf6f14;
+  --color-green-300: #00bf6f24;
+  --color-green-400: #00bf6f38;
+  --color-green-500: #00bf6f70;
+  --color-green-600: #00bf6fd0;
+  --color-green-700: #00bf6f;
+  --color-green-800: color-mix(in oklab, #00bf6f 82%, #0d0d0d);
+  --color-green-900: color-mix(in oklab, #00bf6f 58%, #0d0d0d);
+  --color-green-950: color-mix(in oklab, #00bf6f 45%, #0d0d0d);
+  --color-green-1000: color-mix(in oklab, #00bf6f 35%, #0d0d0d);
+  --color-amber-50: #ffab0005;
+  --color-amber-100: #ffab000a;
+  --color-amber-200: #ffab0014;
+  --color-amber-300: #ffab0024;
+  --color-amber-400: #ffab0038;
+  --color-amber-500: #ffab0070;
+  --color-amber-600: #ffab00d0;
+  --color-amber-700: #ffab00;
+  --color-amber-800: color-mix(in oklab, #ffab00 82%, #0d0d0d);
+  --color-amber-900: color-mix(in oklab, #ffab00 58%, #0d0d0d);
+  --color-amber-950: color-mix(in oklab, #ffab00 45%, #0d0d0d);
+  --color-amber-1000: color-mix(in oklab, #ffab00 35%, #0d0d0d);
+  --color-red-50: #ff2d5505;
+  --color-red-100: #ff2d550a;
+  --color-red-200: #ff2d5514;
+  --color-red-300: #ff2d5524;
+  --color-red-400: #ff2d5538;
+  --color-red-500: #ff2d5570;
+  --color-red-600: #ff2d55d0;
+  --color-red-700: #ff2d55;
+  --color-red-800: color-mix(in oklab, #ff2d55 82%, #0d0d0d);
+  --color-red-900: color-mix(in oklab, #ff2d55 72%, #0d0d0d);
+  --color-red-950: color-mix(in oklab, #ff2d55 45%, #0d0d0d);
+  --color-red-1000: color-mix(in oklab, #ff2d55 35%, #0d0d0d);
+  /* Purple borrowed from Quantexa's deep violet (#3a1961 / #361659) rather than a generic violet. */
+  --color-purple-50: #3a196105;
+  --color-purple-100: #3a19610a;
+  --color-purple-200: #3a196114;
+  --color-purple-300: #3a196124;
+  --color-purple-400: #3a196138;
+  --color-purple-500: #3a196170;
+  --color-purple-600: #3a1961d0;
+  --color-purple-700: #3a1961;
+  --color-purple-800: color-mix(in oklab, #3a1961 82%, #0d0d0d);
+  --color-purple-900: color-mix(in oklab, #3a1961 72%, #0d0d0d);
+  --color-purple-950: color-mix(in oklab, #3a1961 45%, #0d0d0d);
+  --color-purple-1000: color-mix(in oklab, #3a1961 35%, #0d0d0d);
+  --color-teal-50: #12a59405;
+  --color-teal-100: #12a5940a;
+  --color-teal-200: #12a59414;
+  --color-teal-300: #12a59424;
+  --color-teal-400: #12a59438;
+  --color-teal-500: #12a59470;
+  --color-teal-600: #12a594d0;
+  --color-teal-700: #12a594;
+  --color-teal-800: color-mix(in oklab, #12a594 82%, #0d0d0d);
+  --color-teal-900: color-mix(in oklab, #12a594 58%, #0d0d0d);
+  --color-teal-950: color-mix(in oklab, #12a594 45%, #0d0d0d);
+  --color-teal-1000: color-mix(in oklab, #12a594 35%, #0d0d0d);
+  --color-pink-50: #d6409f05;
+  --color-pink-100: #d6409f0a;
+  --color-pink-200: #d6409f14;
+  --color-pink-300: #d6409f24;
+  --color-pink-400: #d6409f38;
+  --color-pink-500: #d6409f70;
+  --color-pink-600: #d6409fd0;
+  --color-pink-700: #d6409f;
+  --color-pink-800: color-mix(in oklab, #d6409f 82%, #0d0d0d);
+  --color-pink-900: color-mix(in oklab, #d6409f 72%, #0d0d0d);
+  --color-pink-950: color-mix(in oklab, #d6409f 45%, #0d0d0d);
+  --color-pink-1000: color-mix(in oklab, #d6409f 35%, #0d0d0d);
+}

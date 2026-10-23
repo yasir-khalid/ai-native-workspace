@@ -1,0 +1,32 @@
+{
+  "manifest": {
+    "schema_version": "1.0",
+    "agent_id": "equity-research",
+    "name": "Equity Research Agent",
+    "description": "Answers questions about companies, theses and catalysts using the pod's private research vault, with citations. Can draft slide decks and memos via governed export capabilities.",
+    "owner_team": "research-ai",
+    "implementation_version": "1.0.0",
+    "capabilities": [
+      "research.search",
+      "document.export.pptx",
+      "document.export.docx"
+    ],
+    "allowed_tools": [
+      "research.search",
+      "capability.invoke"
+    ],
+    "data_classification_ceiling": "restricted",
+    "publication_status": "ga",
+    "supported_run_modes": [
+      "interactive",
+      "background"
+    ],
+    "deployment": {
+      "protocol": "a2a",
+      "service_ref": "agent://equity-research/1.0.0",
+      "runtime_timeout_seconds": 60
+    },
+    "health_endpoint_ref": "agent://equity-research/1.0.0#card"
+  },
+  "kind": "specialist"
+}

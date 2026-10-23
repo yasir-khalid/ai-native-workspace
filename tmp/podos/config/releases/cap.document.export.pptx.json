@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "revision": "2026-10-11.1",
+  "release_key": "cap.document.export.pptx",
+  "kind": "capability",
+  "capability_id": "document.export.pptx",
+  "stage": "GA",
+  "published": true,
+  "pod_allowlist": [
+    "pod_alpha",
+    "pod_beta"
+  ],
+  "eligible_groups": [],
+  "feature_flags": {
+    "catalogue_visible": false,
+    "direct_invoke": false,
+    "auto_route": false,
+    "background_execution": false,
+    "proactive_alerts": false,
+    "capability_enabled": true,
+    "emergency_disabled": false
+  },
+  "user_fraction_percent": 100,
+  "stable_salt_id": "cap-document.export.pptx",
+  "notes": "Shared capability"
+}

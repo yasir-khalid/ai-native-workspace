@@ -1,0 +1,105 @@
+<style>
+#evidence-proposal { color-scheme: light dark; --p-bg:light-dark(#ffffff,#18191c); --p-text:light-dark(#202124,#e5e7eb); --p-sub:light-dark(#60656e,#aeb4bd); --p-line:light-dark(#e4e6eb,#363a41); --p-soft:light-dark(#f5f6f8,#23262d); --p-blue:light-dark(#1d4ed8,#a6c4ff); --p-blue-soft:light-dark(#eff6ff,#223047); --p-warn:light-dark(#7c5200,#f1ce8a); font:14px/1.55 system-ui,sans-serif; color:var(--p-text); }
+#evidence-proposal * { box-sizing:border-box; }
+#evidence-proposal .product { background:var(--p-bg); border:1px solid var(--p-line); border-radius:12px; padding:18px; }
+#evidence-proposal .top { display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; border-bottom:1px solid var(--p-line); padding-bottom:12px; margin-bottom:18px; }
+#evidence-proposal .secondary { color:var(--p-sub); font-size:12px; }
+#evidence-proposal .layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:22px; }
+#evidence-proposal .question { background:var(--p-soft); padding:12px 14px; border-radius:9px; margin-bottom:18px; }
+#evidence-proposal p { margin:0 0 14px; }
+#evidence-proposal strong { font-weight:500; }
+#evidence-proposal .claim { padding:2px 0; }
+#evidence-proposal .cite { font:inherit; font-size:12px; display:inline-block; padding:4px 8px; border:1px solid var(--p-line); border-radius:7px; color:var(--p-blue); background:var(--p-bg); margin:5px 0; text-align:left; }
+#evidence-proposal .cite[aria-pressed=true] { background:var(--p-blue-soft); border-color:var(--p-blue); }
+#evidence-proposal .inspector { border-left:1px solid var(--p-line); padding-left:20px; min-width:0; }
+#evidence-proposal .label { font-size:12px; font-weight:500; color:var(--p-sub); margin-bottom:7px; }
+#evidence-proposal h3 { font-size:15px; font-weight:500; margin:0 0 8px; }
+#evidence-proposal blockquote { margin:16px 0; padding:12px; background:var(--p-soft); border-radius:8px; }
+#evidence-proposal mark { background:var(--p-blue-soft); color:var(--p-text); }
+#evidence-proposal .meta { display:grid; grid-template-columns:72px minmax(0,1fr); gap:5px 10px; font-size:12px; margin:12px 0; }
+#evidence-proposal .meta dt { color:var(--p-sub); }
+#evidence-proposal .meta dd { margin:0; overflow-wrap:anywhere; }
+#evidence-proposal .status { color:var(--p-warn); font-size:12px; margin:12px 0; }
+#evidence-proposal .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+#evidence-proposal a { color:var(--p-blue); text-underline-offset:3px; }
+#evidence-proposal details { border-top:1px solid var(--p-line); padding-top:12px; margin-top:16px; font-size:12px; }
+#evidence-proposal summary { color:var(--p-sub); }
+#evidence-proposal .hash { overflow-wrap:anywhere; font-family:ui-monospace,monospace; font-size:12px; }
+#evidence-proposal .note { border-top:1px solid var(--p-line); margin-top:18px; padding-top:12px; }
+#evidence-proposal button, #evidence-proposal summary { cursor:inherit; }
+@media(max-width:620px) { #evidence-proposal .layout { grid-template-columns:1fr; gap:18px; } #evidence-proposal .inspector { border-left:0; border-top:1px solid var(--p-line); padding:16px 0 0; } #evidence-proposal .cite { min-height:44px; } }
+</style>
+<div id="evidence-proposal">
+  <div class="product">
+    <div class="top"><span>Auto · CoreWeave</span><span class="secondary">Proposed evidence interaction</span></div>
+    <div class="layout">
+      <section aria-label="Answer with claim citations">
+        <div class="question">Does the transcript support roughly $100B of backlog?</div>
+        <p class="claim">The Q1 release reports <strong>$99.4 billion</strong> as of March 31, 2026.<br><button class="cite cursor-interaction" data-source="filing" aria-pressed="false" type="button">1 · Reported figure</button></p>
+        <p class="claim">The interviewer refers to <strong>nearly $100 billion</strong> in the call’s opening.<br><button class="cite cursor-interaction" data-source="transcript" aria-pressed="true" type="button">2 · Transcript</button></p>
+        <p class="claim">The amounts appear consistent after rounding. The quoted passage does not establish a new exact balance.<br><button class="cite cursor-interaction" data-source="interpretation" aria-pressed="false" type="button">3 · Interpretation</button></p>
+      </section>
+      <section class="inspector" aria-label="Evidence inspector" aria-live="polite">
+        <div class="label" id="ep-kind">TRANSCRIPT · SOURCE 2</div>
+        <h3 id="ep-title">JPM conference · CoreWeave</h3>
+        <div class="secondary" id="ep-subtitle">Mark Murphy · JPMorgan interviewer</div>
+        <blockquote id="ep-passage">“Two weeks ago, <mark>nearly $100 billion in backlog.</mark>”</blockquote>
+        <dl class="meta" id="ep-meta"><dt>Location</dt><dd>00:18.54–00:20.36 · sentence s9</dd><dt>Meaning</dt><dd>Interviewer’s statement; not a management quote</dd></dl>
+        <div class="status" id="ep-status">Machine transcript · not audio reviewed</div>
+        <div class="actions" id="ep-actions"><a href="http://localhost:3400/pod_beta/calls/crwv-jpm-2026?s=s9&amp;t=18.54" target="_blank" rel="noreferrer">Open transcript at 00:18</a></div>
+        <details><summary class="cursor-interaction">Provenance details</summary><div id="ep-provenance"><p>Speaker attribution: reference timing map.</p><p>Stored transcript SHA-256:</p><div class="hash">8a8e4455a1f9f2023ecb7b9eb5d9bc5c487499d9bd8c03e3f587686d65787397</div></div></details>
+      </section>
+    </div>
+    <div class="secondary note">Concept preview using real source excerpts. No automated verification or live audio is simulated.</div>
+  </div>
+</div>
+<script>
+(() => {
+  const root = document.getElementById('evidence-proposal');
+  const sources = {
+    transcript: {
+      kind:'TRANSCRIPT · SOURCE 2', title:'JPM conference · CoreWeave', subtitle:'Mark Murphy · JPMorgan interviewer',
+      passage:'“Two weeks ago, <mark>nearly $100 billion in backlog.</mark>”',
+      meta:'<dt>Location</dt><dd>00:18.54–00:20.36 · sentence s9</dd><dt>Meaning</dt><dd>Interviewer’s statement; not a management quote</dd>',
+      status:'Machine transcript · not audio reviewed',
+      actions:'<a href="http://localhost:3400/pod_beta/calls/crwv-jpm-2026?s=s9&amp;t=18.54" target="_blank" rel="noreferrer">Open transcript at 00:18</a>',
+      provenance:'<p>Speaker attribution: reference timing map.</p><p>Stored transcript SHA-256:</p><div class="hash">8a8e4455a1f9f2023ecb7b9eb5d9bc5c487499d9bd8c03e3f587686d65787397</div>'
+    },
+    filing: {
+      kind:'EARNINGS RELEASE · SOURCE 1', title:'Q1 2026 financial results', subtitle:'CoreWeave · published May 7, 2026',
+      passage:'“Revenue backlog¹ was <mark>$99.4 billion</mark> as of March 31, 2026.”',
+      meta:'<dt>Period</dt><dd>Balance as of March 31, 2026</dd><dt>Location</dt><dd>8-K exhibit 99.1 · Additional financial highlights</dd><dt>Units</dt><dd>USD billions · revenue backlog</dd>',
+      status:'Published figure · distinct from the transcript wording',
+      actions:'<a href="https://www.sec.gov/Archives/edgar/data/1769628/000176962826000220/coreweave1q26earningspress.htm" target="_blank" rel="noreferrer">Open SEC exhibit</a>',
+      provenance:'<p>Issuer CIK: 1769628</p><p>Accession: 0001769628-26-000220</p><p>Metric definition includes remaining performance obligations and certain other committed amounts. Source value and quote were selected for this concept preview.</p>'
+    },
+    interpretation: {
+      kind:'INTERPRETATION · SUPPORTS 1 + 2', title:'Rounding comparison', subtitle:'An explanation based on two sources',
+      passage:'$99.4B in the release is approximately $100B. The transcript uses an approximate amount.',
+      meta:'<dt>Supports</dt><dd>Reported backlog amount + transcript passage</dd><dt>Limit</dt><dd>The quoted passage does not supply a new as-of date or exact updated figure.</dd>',
+      status:'Interpretation · not a quotation or independent disclosure',
+      actions:'<button class="cite cursor-interaction" data-source="filing" type="button">Inspect source 1</button><button class="cite cursor-interaction" data-source="transcript" type="button">Inspect source 2</button>',
+      provenance:'<p>Both supporting records remain inspectable. A source link alone does not verify a broader conclusion.</p>'
+    }
+  };
+  function select(key, persist = true) {
+    const data = sources[key]; if (!data) return;
+    ['kind','title','subtitle','status'].forEach(field => root.querySelector('#ep-'+field).textContent = data[field]);
+    ['passage','meta','actions','provenance'].forEach(field => root.querySelector('#ep-'+field).innerHTML = data[field]);
+    root.querySelectorAll('[data-source]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.source === key)));
+    if (persist && window.openai && window.openai.setWidgetState) window.openai.setWidgetState({modelContent:{selectedEvidence:key},privateContent:null}).catch(() => {});
+  }
+  root.addEventListener('click', event => { const button = event.target.closest('[data-source]'); if (button && root.contains(button)) select(button.dataset.source); });
+  select('filing', false);
+  console.assert(root.querySelector('#ep-title').textContent === 'Q1 2026 financial results', 'Reported-figure selection failed');
+  select('interpretation', false);
+  console.assert(root.querySelector('#ep-actions').querySelectorAll('[data-source]').length === 2, 'Supporting sources unavailable');
+  select(window.openai?.widgetState?.modelContent?.selectedEvidence || 'transcript', false);
+  window.addEventListener('openai:set_globals', event => {
+    const key = event.detail?.globals?.widgetState?.modelContent?.selectedEvidence;
+    if (key) select(key, false);
+  });
+  console.log('Evidence inspector checks passed; three source types, no network requests.');
+  requestAnimationFrame(() => console.assert(root.scrollWidth <= root.clientWidth, 'Horizontal overflow'));
+})();
+</script>

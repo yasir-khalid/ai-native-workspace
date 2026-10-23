@@ -1,0 +1,70 @@
+model
+  schema 1.1
+
+# PodOS authorization model (ARCHITECTURE.md §4.2 entitlements; rollout stays in releases/OpenFeature).
+#
+# Every grantable thing is a POD-SCOPED object "<pod_id>/<id>" whose decision relation is
+# "grantee AND member from pod". A grant therefore can never reach outside its pod: even a tuple that
+# names another pod's group only matches people who are also live members of this pod.
+# Time-bound grants (access requests) carry the not_expired condition.
+
+type user
+
+# Non-human principals: agent deployments and background workloads (service grants).
+type service
+
+type platform
+  relations
+    define admin: [user]
+    define access_approver: [user]
+
+type pod
+  relations
+    define platform: [platform]
+    define pm: [user]
+    define analyst: [user]
+    define member: pm or analyst
+    define approver: [user, user with not_expired, group#member]
+    define can_approve: approver and member
+    define restricted_reader: [user, user with not_expired, group#member] or pm
+    define can_read_restricted: restricted_reader and member
+    define admin: admin from platform
+
+# Pod-scoped access group, id "<pod_id>/<name>" (research_users, deck_builders, approvers, ...).
+type group
+  relations
+    define pod: [pod]
+    define member: [user, user with not_expired]
+
+type agent
+  relations
+    define pod: [pod]
+    define grantee: [user, user with not_expired, group#member, pod#member]
+    define can_use: grantee and member from pod
+
+type capability
+  relations
+    define pod: [pod]
+    define grantee: [user, user with not_expired, group#member, pod#member]
+    define can_invoke: grantee and member from pod
+
+type dataset
+  relations
+    define pod: [pod]
+    define grantee: [user, user with not_expired, group#member, pod#member]
+    define can_read: grantee and member from pod
+
+type feature
+  relations
+    define pod: [pod]
+    define grantee: [user, user with not_expired, group#member, pod#member]
+    define enabled_for: grantee and member from pod
+
+# Firm-wide tool definition (capability id). Service grants: which agents/workloads may call it at all.
+type tool
+  relations
+    define caller: [service]
+
+condition not_expired(current_time: timestamp, expires_at: timestamp) {
+  current_time < expires_at
+}

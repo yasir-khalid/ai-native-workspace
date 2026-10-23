@@ -1,0 +1,15 @@
+{
+  "_comment": "DEV ONLY. External A2A agents PodOS connects to at seed time. Each runs as its own service; PodOS marks it available when its Agent Card answers (checked every 30s). Production: connect agents from Admin -> Registry -> Connect A2A agent instead.",
+  "agents": [
+    {
+      "agent_id": "entity-intelligence",
+      "name": "Institutional Entity Intelligence",
+      "description": "Answers questions about legal entities and institutions from public records: GLEIF identity and corporate hierarchy, SEC 13F reported holdings, 13D/G beneficial owners, N-PORT funds, Form ADV, FFIEC bank control and Companies House. Every figure is cited to a source record and the answer is independently verified.",
+      "owner_team": "Institutional Entity Intelligence",
+      "version": "0.1.0",
+      "url": "http://127.0.0.1:8000",
+      "pods": ["pod_alpha", "pod_beta"],
+      "stage": "POD_PILOT_AUTO"
+    }
+  ]
+}

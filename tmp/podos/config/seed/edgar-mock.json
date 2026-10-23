@@ -1,0 +1,28 @@
+{
+  "_comment": "Fixtures for the mock SEC EDGAR MCP server (fictional issuers). `scripted` filings are released one at a time by POST /control/filings {\"ticker\": ...}.",
+  "entities": [
+    {"ticker": "NWSC", "name": "Northwind Semiconductor Corp.", "cik": "0009000001"},
+    {"ticker": "LGS", "name": "Lumen Grid Software Inc.", "cik": "0009000002"},
+    {"ticker": "HLXT", "name": "Helix Therapeutics Inc.", "cik": "0009000003"}
+  ],
+  "history": [
+    {"ticker": "LGS", "form": "10-Q", "accepted_at": "2026-08-07T20:05:00Z", "title": "Quarterly report for the period ended June 30, 2026",
+     "summary": "ARR up 31% year over year; net revenue retention 118%. No changes to risk factors."}
+  ],
+  "scripted": {
+    "NWSC": [
+      {"form": "8-K", "title": "Item 2.02 and 7.01: Raised FY26 guidance; export licence pending",
+       "summary": "Northwind raises FY26 revenue guidance to 4.9bn from 4.6bn on accelerated 1.6T transceiver demand. Separately discloses that an export control licence for advanced optical modules to one jurisdiction remains pending."},
+      {"form": "8-K", "title": "Item 5.02: Departure of Chief Financial Officer",
+       "summary": "The Chief Financial Officer will resign effective November 30, 2026 to pursue another opportunity. The company has begun a search; the VP Finance will serve as interim CFO."}
+    ],
+    "LGS": [
+      {"form": "8-K", "title": "Item 1.01: Multi-year utility contract",
+       "summary": "Lumen Grid signs a five-year platform agreement with a top-ten US utility. Management reiterates full-year guidance."}
+    ],
+    "HLXT": [
+      {"form": "8-K", "title": "Item 8.01: FDA advisory committee update",
+       "summary": "FDA informed the company that the advisory committee for HX-201 is no longer planned; the PDUFA date of 14 November 2026 is unchanged. No new adverse event signals identified."}
+    ]
+  }
+}

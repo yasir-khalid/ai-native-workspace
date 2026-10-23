@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "revision": "2026-10-10.1",
+  "release_key": "research-agent-v2",
+  "agent_id": "equity-research",
+  "agent_version": "2.0.0",
+  "published": true,
+  "pod_allowlist": ["pod_alpha"],
+  "eligible_groups": ["research_users"],
+  "feature_flags": {
+    "catalogue_visible": true,
+    "direct_invoke": true,
+    "auto_route": false,
+    "background_execution": false,
+    "proactive_alerts": false,
+    "emergency_disabled": false
+  },
+  "user_fraction_percent": 100,
+  "stable_salt_id": "research-agent-2026q4",
+  "runtime_canary": {
+    "stable_version": "1.9.0",
+    "candidate_version": "2.0.0",
+    "candidate_fraction_percent": 0
+  },
+  "notes": "All allowlists and cohort checks are applied after identity entitlement checks"
+}

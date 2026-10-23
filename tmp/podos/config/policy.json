@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.1",
+  "revision": "ops-2026-10-15.1",
+  "_comment": "Operational policy (quotas), hot-reloaded. Who may do what is NOT here: that is OpenFGA (see config/access-template.json for the seed).",
+  "pod_quotas": {
+    "default": {
+      "max_concurrent_runs": 4,
+      "runs_per_minute": 30,
+      "max_tool_calls_per_run": 6
+    }
+  }
+}

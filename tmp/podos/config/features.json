@@ -1,0 +1,6 @@
+[
+  {"feature_id": "briefing", "name": "Today briefing", "description": "A morning brief of what changed for the pod, what is coming up and what is waiting on you."},
+  {"feature_id": "event_triggers", "name": "Event-triggered monitors", "description": "Monitors fire when a filing or other event arrives, not only on a schedule."},
+  {"feature_id": "memory", "name": "Memory", "description": "PodOS remembers preferences and pod facts you confirm, and shows what it used."},
+  {"feature_id": "teams_delivery", "name": "Teams and Slack delivery", "description": "Important alerts and approvals delivered in chat apps."}
+]

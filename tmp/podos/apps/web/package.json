@@ -1,0 +1,54 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "openui:prompt": "node scripts/openui-prompt.mjs",
+    "openui:check": "node scripts/openui-prompt.mjs --check"
+  },
+  "dependencies": {
+    "@assistant-ui/react": "^0.15.27",
+    "@assistant-ui/react-markdown": "^0.14.20",
+    "@base-ui/react": "^1.9.0",
+    "@openuidev/react-headless": "^0.18.1",
+    "@openuidev/react-lang": "^1.0.1",
+    "@openuidev/react-ui": "^0.18.1",
+    "class-variance-authority": "^0.7.1",
+    "cmdk": "^1.1.1",
+    "cn": "^0.4.0",
+    "lucide-react": "^1.55.0",
+    "next": "16.4.0",
+    "next-themes": "^0.4.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "remark-gfm": "^4.0.1",
+    "shadcn": "^4.21.4",
+    "sonner": "^2.0.8",
+    "swr": "^2.5.1",
+    "tw-animate-css": "^1.4.0",
+    "tw-shimmer": "^0.4.13",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "overrides": {
+    "@openuidev/react-headless": {
+      "zustand": "$zustand"
+    },
+    "@openuidev/react-ui": {
+      "zustand": "$zustand"
+    }
+  }
+}

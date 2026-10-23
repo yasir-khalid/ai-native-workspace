@@ -1,0 +1,659 @@
+{
+  "created_at": "2026-10-23T18:32:26.312168+00:00",
+  "reference_status": "unreviewed published references, extracted from StockAnalysis embedded Quartr event data",
+  "validated_gold": false,
+  "target_wer": 0.04,
+  "gold_target_demonstrated": false,
+  "aggregation": "sum(S+D+I)/sum(reference_words); never mix partial and full corpus",
+  "packages": {
+    "jiwer": "4.0.0",
+    "whisper-normalizer": "0.1.15"
+  },
+  "manifest_sha256": "eba73eec8a934513b1a2ba6e936b110486fa14d86a194381afcc8959d9d95b8d",
+  "evaluator_sha256": "84b1d76f4cdaf113c599c836e3ea26152e857b53d50be5d82e3772acd7c83ee6",
+  "quality_policy_sha256": "b072a6118c5e608bb681f1b60eef0fe452a187483734fb972dbbb35196ce43b9",
+  "full_report": {
+    "path": "var/calls/experiments/2026-10-23/final-v3-report.json",
+    "sha256": "583290627714935cd370ae85236fce593e0fe7e5dad0a4a53c2c260a02bd1274"
+  },
+  "events": [
+    {
+      "id": "crwv-jpm-2026",
+      "reference": "var/calls/reference/crwv-jpm-2026.json",
+      "audio": "var/calls/audio/crwv-jpm-2026.mp3",
+      "reference_sha256": "76ddf0702479b9b50777485069370099f3ba09cc432034c3590a189600d54a8a",
+      "audio_sha256": "301041fca0fac7adf14bb7422996e569fa9eb393c07c18520674c75950f38ae3",
+      "reference_source_url": "https://stockanalysis.com/stocks/crwv/transcripts/671041-j-p-morgan-54th-annual-global-technology-media-and-communications-conference/",
+      "human_audio_reviewed": false,
+      "reference_policy": "Published reference; verbatim/editing policy unverified. Not gold.",
+      "audio_source_url": "https://files.quartr.com/audio-files/a8d4a1dd80a630f3983b28ff6849d29a-2026-05-19-16-19-56.mpeg?ref=U0E="
+    },
+    {
+      "id": "aur-evercore-2026",
+      "reference": "var/calls/reference/aur-evercore-2026.json",
+      "audio": "var/calls/audio/aur-evercore-2026.mp3",
+      "reference_sha256": "dd31dffacb30c3341ffd6ab4be48594c52431a9c3adeafc70e6c2fadd3e930e5",
+      "audio_sha256": "5116901814eadfd5e7c7ed4d4718d94c98bbdacc5c3e572435d51e28a9b94372",
+      "reference_source_url": "https://stockanalysis.com/stocks/aur/transcripts/737723-evercore-s-9th-annual-adas-av-ai-forum/",
+      "human_audio_reviewed": false,
+      "reference_policy": "Published reference; verbatim/editing policy unverified. Not gold.",
+      "audio_source_url": "https://files.quartr.com/audio-files/fd62a8f6031f39be3044dfe5a10e3b15-2026-09-29-13-34-50.mpeg?ref=U0E="
+    }
+  ],
+  "results": [
+    {
+      "event_id": "crwv-jpm-2026",
+      "candidate": "baseline_raw",
+      "candidate_status": "experimental_not_promoted",
+      "sha256": "f730c1d5cbb377885343944994a6be2196d0e873f2b07a0179dcd351946b9afe",
+      "quality_needs_review": false,
+      "scores": {
+        "legacy": {
+          "wer": 0.08579416390005241,
+          "reference_words": 5723,
+          "hypothesis_words": 5717,
+          "substitutions": 141,
+          "deletions": 178,
+          "insertions": 172,
+          "hits": 5404
+        },
+        "whisper_english": {
+          "wer": 0.07537101884275471,
+          "reference_words": 5997,
+          "hypothesis_words": 5969,
+          "substitutions": 110,
+          "deletions": 185,
+          "insertions": 157,
+          "hits": 5702
+        }
+      }
+    },
+    {
+      "event_id": "crwv-jpm-2026",
+      "candidate": "baseline_display",
+      "candidate_status": "experimental_not_promoted",
+      "sha256": "8a8e4455a1f9f2023ecb7b9eb5d9bc5c487499d9bd8c03e3f587686d65787397",
+      "quality_needs_review": false,
+      "scores": {
+        "legacy": {
+          "wer": 0.08719203215096977,
+          "reference_words": 5723,
+          "hypothesis_words": 5691,
+          "substitutions": 141,
+          "deletions": 195,
+          "insertions": 163,
+          "hits": 5387
+        },
+        "whisper_english": {
+          "wer": 0.07737201934300483,
+          "reference_words": 5997,
+          "hypothesis_words": 5943,
+          "substitutions": 110,
+          "deletions": 204,
+          "insertions": 150,
+          "hits": 5683
+        }
+      }
+    },
+    {
+      "event_id": "crwv-jpm-2026",
+      "candidate": "preserved_word_alignment",
+      "candidate_status": "experimental_not_promoted",
+      "sha256": "745be484bfeb5b482e4c26604c87277b54c986a047e937dff92c292b0f09e031",
+      "quality_needs_review": false,
+      "scores": {
+        "legacy": {
+          "wer": 0.08579416390005241,
+          "reference_words": 5723,
+          "hypothesis_words": 5717,
+          "substitutions": 141,
+          "deletions": 178,
+          "insertions": 172,
+          "hits": 5404
+        },
+        "whisper_english": {
+          "wer": 0.07537101884275471,
+          "reference_words": 5997,
+          "hypothesis_words": 5969,
+          "substitutions": 110,
+          "deletions": 185,
+          "insertions": 157,
+          "hits": 5702
+        }
+      }
+    },
+    {
+      "event_id": "crwv-jpm-2026",
+      "candidate": "parakeet_v3",
+      "candidate_status": "experimental_not_promoted",
+      "sha256": "81b86867e0f17ee746a24790dbd794eca65e5895e9e72a4c6a1c18428c3ec83f",
+      "quality_needs_review": false,
+      "scores": {
+        "legacy": {
+          "wer": 0.11916826839070417,
+          "reference_words": 5723,
+          "hypothesis_words": 6042,
+          "substitutions": 165,
+          "deletions": 99,
+          "insertions": 418,
+          "hits": 5459
+        },
+        "whisper_english": {
+          "wer": 0.09154577288644322,
+          "reference_words": 5997,
+          "hypothesis_words": 6191,
+          "substitutions": 131,
+          "deletions": 112,
+          "insertions": 306,
+          "hits": 5754
+        }
+      }
+    },
+    {
+      "event_id": "crwv-jpm-2026",
+      "candidate": "turbo_vocabulary",
+      "candidate_status": "experimental_not_promoted",
+      "sha256": "30ab7d086772ac3347a763142d6f9205f78fc53b40183f29d8a3f23b670db963",
+      "quality_needs_review": false,
+      "scores": {
+        "legacy": {
+          "wer": 0.08282369386685305,
+          "reference_words": 5723,
+          "hypothesis_words": 5722,
+          "substitutions": 135,
+          "deletions": 170,
+          "insertions": 169,
+          "hits": 5418
+        },
+        "whisper_english": {
+          "wer": 0.07253626813406704,
+          "reference_words": 5997,
+          "hypothesis_words": 5974,
+          "substitutions": 104,
+          "deletions": 177,
+          "insertions": 154,
+          "hits": 5716
+        }
+      }
+    },
+    {
+      "event_id": "aur-evercore-2026",
+      "candidate": "baseline_raw",
+      "candidate_status": "experimental_not_promoted",
+      "sha256": "157bd952bd099a18da3e24398753c3a8be85324cebbe5e6c909fd962c080b642",
+      "quality_needs_review": false,
+      "scores": {
+        "legacy": {
+          "wer": 0.08544543936864471,
+          "reference_words": 6589,
+          "hypothesis_words": 6710,
+          "substitutions": 196,
+          "deletions": 123,
+          "insertions": 244,
+          "hits": 6270
+        },
+        "whisper_english": {
+          "wer": 0.0537969980680636,
+          "reference_words": 6729,
+          "hypothesis_words": 6954,
+          "substitutions": 71,
+          "deletions": 33,
+          "insertions": 258,
+          "hits": 6625
+        }
+      }
+    },
+    {
+      "event_id": "aur-evercore-2026",
+      "candidate": "baseline_display",
+      "candidate_status": "experimental_not_promoted",
+      "sha256": "a57a204af05e5363d36f1625f98ed0415ff345979a2894dfffc7eac23759114d",
+      "quality_needs_review": false,
+      "scores": {
+        "legacy": {
+          "wer": 0.08574897556533617,
+          "reference_words": 6589,
+          "hypothesis_words": 6702,
+          "substitutions": 196,
+          "deletions": 128,
+          "insertions": 241,
+          "hits": 6265
+        },
+        "whisper_english": {
+          "wer": 0.05409421905186506,
+          "reference_words": 6729,
+          "hypothesis_words": 6946,
+          "substitutions": 71,
+          "deletions": 38,
+          "insertions": 255,
+          "hits": 6620
+        }
+      }
+    },
+    {
+      "event_id": "aur-evercore-2026",
+      "candidate": "preserved_word_alignment",
+      "candidate_status": "experimental_not_promoted",
+      "sha256": "2d77bc7005de694375687b8fd7b839f7af123a9829447be435bb5c86553bb27b",
+      "quality_needs_review": false,
+      "scores": {
+        "legacy": {
+          "wer": 0.08544543936864471,
+          "reference_words": 6589,
+          "hypothesis_words": 6710,
+          "substitutions": 196,
+          "deletions": 123,
+          "insertions": 244,
+          "hits": 6270
+        },
+        "whisper_english": {
+          "wer": 0.0537969980680636,
+          "reference_words": 6729,
+          "hypothesis_words": 6954,
+          "substitutions": 71,
+          "deletions": 33,
+          "insertions": 258,
+          "hits": 6625
+        }
+      }
+    },
+    {
+      "event_id": "aur-evercore-2026",
+      "candidate": "parakeet_v3",
+      "candidate_status": "experimental_not_promoted",
+      "sha256": "6ec9696fa50220608b335f0e38b617db15fc0dee15eeeba28d5cc19eec70f5a7",
+      "quality_needs_review": false,
+      "scores": {
+        "legacy": {
+          "wer": 0.18728183335862802,
+          "reference_words": 6589,
+          "hypothesis_words": 7080,
+          "substitutions": 321,
+          "deletions": 211,
+          "insertions": 702,
+          "hits": 6057
+        },
+        "whisper_english": {
+          "wer": 0.11695645712587309,
+          "reference_words": 6729,
+          "hypothesis_words": 7186,
+          "substitutions": 112,
+          "deletions": 109,
+          "insertions": 566,
+          "hits": 6508
+        }
+      }
+    },
+    {
+      "event_id": "aur-evercore-2026",
+      "candidate": "turbo_vocabulary",
+      "candidate_status": "experimental_not_promoted",
+      "sha256": "c97594154b9a6bc0c655794df5cbba6b8739e421ab9649babb93e880b81f4dd3",
+      "quality_needs_review": false,
+      "scores": {
+        "legacy": {
+          "wer": 0.08802549704052208,
+          "reference_words": 6589,
+          "hypothesis_words": 6742,
+          "substitutions": 201,
+          "deletions": 113,
+          "insertions": 266,
+          "hits": 6275
+        },
+        "whisper_english": {
+          "wer": 0.056471986922276715,
+          "reference_words": 6729,
+          "hypothesis_words": 6984,
+          "substitutions": 75,
+          "deletions": 25,
+          "insertions": 280,
+          "hits": 6629
+        }
+      }
+    },
+    {
+      "event_id": "aur-evercore-2026",
+      "candidate": "large_v3_vocabulary",
+      "candidate_status": "rejected_repetition",
+      "sha256": "ad7c9a4182d8eb1e903d6b1ea6767cd38b556aefd5f2e9bde3039c8f7c14ed39",
+      "quality_needs_review": true,
+      "scores": {
+        "legacy": {
+          "wer": 0.8535437850963727,
+          "reference_words": 6589,
+          "hypothesis_words": 7124,
+          "substitutions": 5035,
+          "deletions": 27,
+          "insertions": 562,
+          "hits": 1527
+        },
+        "whisper_english": {
+          "wer": 1.1319661168078465,
+          "reference_words": 6729,
+          "hypothesis_words": 9475,
+          "substitutions": 4863,
+          "deletions": 4,
+          "insertions": 2750,
+          "hits": 1862
+        }
+      }
+    },
+    {
+      "event_id": "aur-evercore-2026",
+      "candidate": "three_way_vote",
+      "candidate_status": "rejected_parent_failed_quality",
+      "sha256": "07392982728e8508e1ae8c8b80055eaa8f80abb7703761f9696b10c7a288e980",
+      "quality_needs_review": false,
+      "scores": {
+        "legacy": {
+          "wer": 0.08605251176202762,
+          "reference_words": 6589,
+          "hypothesis_words": 6711,
+          "substitutions": 199,
+          "deletions": 123,
+          "insertions": 245,
+          "hits": 6267
+        },
+        "whisper_english": {
+          "wer": 0.05439144003566652,
+          "reference_words": 6729,
+          "hypothesis_words": 6955,
+          "substitutions": 74,
+          "deletions": 33,
+          "insertions": 259,
+          "hits": 6622
+        }
+      }
+    },
+    {
+      "event_id": "aur-evercore-2026",
+      "candidate": "large_v3_resilient",
+      "candidate_status": "experimental_not_promoted",
+      "sha256": "fb34d8fdd0903d3f43745fac988a6a7525a33cc043aae599cb8a501aeb0e8474",
+      "quality_needs_review": false,
+      "scores": {
+        "legacy": {
+          "wer": 0.09333738048262255,
+          "reference_words": 6589,
+          "hypothesis_words": 6712,
+          "substitutions": 220,
+          "deletions": 136,
+          "insertions": 259,
+          "hits": 6233
+        },
+        "whisper_english": {
+          "wer": 0.05721503938178035,
+          "reference_words": 6729,
+          "hypothesis_words": 6968,
+          "substitutions": 76,
+          "deletions": 35,
+          "insertions": 274,
+          "hits": 6618
+        }
+      }
+    },
+    {
+      "event_id": "aur-evercore-2026",
+      "candidate": "three_way_resilient_vote",
+      "candidate_status": "experimental_not_promoted",
+      "sha256": "a7a456c2e9ee03a4a6529e37749cb75f553b6a238db829a1eba6566b2133ac88",
+      "quality_needs_review": false,
+      "scores": {
+        "legacy": {
+          "wer": 0.091971467597511,
+          "reference_words": 6589,
+          "hypothesis_words": 6710,
+          "substitutions": 215,
+          "deletions": 135,
+          "insertions": 256,
+          "hits": 6239
+        },
+        "whisper_english": {
+          "wer": 0.05617476593847526,
+          "reference_words": 6729,
+          "hypothesis_words": 6967,
+          "substitutions": 74,
+          "deletions": 33,
+          "insertions": 271,
+          "hits": 6622
+        }
+      }
+    }
+  ],
+  "aggregate": [
+    {
+      "candidate": "baseline_raw",
+      "normalizer": "legacy",
+      "reference_words": 12312,
+      "hypothesis_words": 12427,
+      "substitutions": 337,
+      "deletions": 301,
+      "insertions": 416,
+      "hits": 11674,
+      "events": 2,
+      "wer": 0.08560753736192332,
+      "all_events_evaluated": true
+    },
+    {
+      "candidate": "baseline_raw",
+      "normalizer": "whisper_english",
+      "reference_words": 12726,
+      "hypothesis_words": 12923,
+      "substitutions": 181,
+      "deletions": 218,
+      "insertions": 415,
+      "hits": 12327,
+      "events": 2,
+      "wer": 0.06396353921106396,
+      "all_events_evaluated": true
+    },
+    {
+      "candidate": "baseline_display",
+      "normalizer": "legacy",
+      "reference_words": 12312,
+      "hypothesis_words": 12393,
+      "substitutions": 337,
+      "deletions": 323,
+      "insertions": 404,
+      "hits": 11652,
+      "events": 2,
+      "wer": 0.08641975308641975,
+      "all_events_evaluated": true
+    },
+    {
+      "candidate": "baseline_display",
+      "normalizer": "whisper_english",
+      "reference_words": 12726,
+      "hypothesis_words": 12889,
+      "substitutions": 181,
+      "deletions": 242,
+      "insertions": 405,
+      "hits": 12303,
+      "events": 2,
+      "wer": 0.06506364922206506,
+      "all_events_evaluated": true
+    },
+    {
+      "candidate": "preserved_word_alignment",
+      "normalizer": "legacy",
+      "reference_words": 12312,
+      "hypothesis_words": 12427,
+      "substitutions": 337,
+      "deletions": 301,
+      "insertions": 416,
+      "hits": 11674,
+      "events": 2,
+      "wer": 0.08560753736192332,
+      "all_events_evaluated": true
+    },
+    {
+      "candidate": "preserved_word_alignment",
+      "normalizer": "whisper_english",
+      "reference_words": 12726,
+      "hypothesis_words": 12923,
+      "substitutions": 181,
+      "deletions": 218,
+      "insertions": 415,
+      "hits": 12327,
+      "events": 2,
+      "wer": 0.06396353921106396,
+      "all_events_evaluated": true
+    },
+    {
+      "candidate": "parakeet_v3",
+      "normalizer": "legacy",
+      "reference_words": 12312,
+      "hypothesis_words": 13122,
+      "substitutions": 486,
+      "deletions": 310,
+      "insertions": 1120,
+      "hits": 11516,
+      "events": 2,
+      "wer": 0.15562053281351526,
+      "all_events_evaluated": true
+    },
+    {
+      "candidate": "parakeet_v3",
+      "normalizer": "whisper_english",
+      "reference_words": 12726,
+      "hypothesis_words": 13377,
+      "substitutions": 243,
+      "deletions": 221,
+      "insertions": 872,
+      "hits": 12262,
+      "events": 2,
+      "wer": 0.10498192676410498,
+      "all_events_evaluated": true
+    },
+    {
+      "candidate": "turbo_vocabulary",
+      "normalizer": "legacy",
+      "reference_words": 12312,
+      "hypothesis_words": 12464,
+      "substitutions": 336,
+      "deletions": 283,
+      "insertions": 435,
+      "hits": 11693,
+      "events": 2,
+      "wer": 0.08560753736192332,
+      "all_events_evaluated": true
+    },
+    {
+      "candidate": "turbo_vocabulary",
+      "normalizer": "whisper_english",
+      "reference_words": 12726,
+      "hypothesis_words": 12958,
+      "substitutions": 179,
+      "deletions": 202,
+      "insertions": 434,
+      "hits": 12345,
+      "events": 2,
+      "wer": 0.06404211849756404,
+      "all_events_evaluated": true
+    },
+    {
+      "candidate": "large_v3_vocabulary",
+      "normalizer": "legacy",
+      "reference_words": 6589,
+      "hypothesis_words": 7124,
+      "substitutions": 5035,
+      "deletions": 27,
+      "insertions": 562,
+      "hits": 1527,
+      "events": 1,
+      "wer": 0.8535437850963727,
+      "all_events_evaluated": false
+    },
+    {
+      "candidate": "large_v3_vocabulary",
+      "normalizer": "whisper_english",
+      "reference_words": 6729,
+      "hypothesis_words": 9475,
+      "substitutions": 4863,
+      "deletions": 4,
+      "insertions": 2750,
+      "hits": 1862,
+      "events": 1,
+      "wer": 1.1319661168078465,
+      "all_events_evaluated": false
+    },
+    {
+      "candidate": "three_way_vote",
+      "normalizer": "legacy",
+      "reference_words": 6589,
+      "hypothesis_words": 6711,
+      "substitutions": 199,
+      "deletions": 123,
+      "insertions": 245,
+      "hits": 6267,
+      "events": 1,
+      "wer": 0.08605251176202762,
+      "all_events_evaluated": false
+    },
+    {
+      "candidate": "three_way_vote",
+      "normalizer": "whisper_english",
+      "reference_words": 6729,
+      "hypothesis_words": 6955,
+      "substitutions": 74,
+      "deletions": 33,
+      "insertions": 259,
+      "hits": 6622,
+      "events": 1,
+      "wer": 0.05439144003566652,
+      "all_events_evaluated": false
+    },
+    {
+      "candidate": "large_v3_resilient",
+      "normalizer": "legacy",
+      "reference_words": 6589,
+      "hypothesis_words": 6712,
+      "substitutions": 220,
+      "deletions": 136,
+      "insertions": 259,
+      "hits": 6233,
+      "events": 1,
+      "wer": 0.09333738048262255,
+      "all_events_evaluated": false
+    },
+    {
+      "candidate": "large_v3_resilient",
+      "normalizer": "whisper_english",
+      "reference_words": 6729,
+      "hypothesis_words": 6968,
+      "substitutions": 76,
+      "deletions": 35,
+      "insertions": 274,
+      "hits": 6618,
+      "events": 1,
+      "wer": 0.05721503938178035,
+      "all_events_evaluated": false
+    },
+    {
+      "candidate": "three_way_resilient_vote",
+      "normalizer": "legacy",
+      "reference_words": 6589,
+      "hypothesis_words": 6710,
+      "substitutions": 215,
+      "deletions": 135,
+      "insertions": 256,
+      "hits": 6239,
+      "events": 1,
+      "wer": 0.091971467597511,
+      "all_events_evaluated": false
+    },
+    {
+      "candidate": "three_way_resilient_vote",
+      "normalizer": "whisper_english",
+      "reference_words": 6729,
+      "hypothesis_words": 6967,
+      "substitutions": 74,
+      "deletions": 33,
+      "insertions": 271,
+      "hits": 6622,
+      "events": 1,
+      "wer": 0.05617476593847526,
+      "all_events_evaluated": false
+    }
+  ]
+}

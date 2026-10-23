@@ -1,0 +1,212 @@
+@layer theme, base, openui, components, utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "tw-shimmer";
+@import "./openrouter.css";
+/* OpenUI (generative UI in chat answers), cascade-layered so Tailwind utilities still win. Import it only here. */
+@import "@openuidev/react-ui/layered/styles/index.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-ui-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-heading: var(--font-sans);
+  --color-canvas: var(--canvas);
+  --color-subtle: var(--subtle);
+  --color-link: var(--link);
+  --color-positive: var(--positive);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-4xl: 24px;
+  --font-weight-medium: 510;
+  --font-weight-semibold: 590;
+  --shadow-2xs: 0 0 #0000;
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 0 #0000;
+  --shadow-md: 0 0 #0000;
+  --shadow-lg: 0 0 #0000;
+  --shadow-xl: 0 0 #0000;
+  --shadow-2xl: 0 0 #0000;
+  @keyframes collapsible-down {
+  from {
+    height: 0;
+    }
+  to {
+    height: var(--radix-collapsible-content-height, var(--collapsible-panel-height, auto));
+    }
+  }
+  @keyframes collapsible-up {
+  from {
+    height: var(--radix-collapsible-content-height, var(--collapsible-panel-height, auto));
+    }
+  to {
+    height: 0;
+    }
+  }
+}
+
+:root {
+  /* Light theme, a blend of three: Linear's structure and 8% black hairlines, Grok's stark near-black
+     ink (#0D0D0D) and monochrome solid buttons, and ChatGPT's clean white canvas #FFFFFF with soft
+     neutral fills. Linear's indigo #5E6AD2 drives links, focus, selection and accents; the primary
+     solid (buttons, badges, brand) is Grok/ChatGPT near-black. Surfaces are layered (canvas → card →
+     popover), never grey-on-grey. */
+  color-scheme: light;
+  --color-violet: #5e6ad2;
+  --background: #ffffff;
+  --canvas: #ffffff;
+  --foreground: #0d0d0d;
+  --card: #ffffff;
+  --card-foreground: #0d0d0d;
+  --popover: #ffffff;
+  --popover-foreground: #0d0d0d;
+  --primary: #0d0d0d;
+  --primary-foreground: #ffffff;
+  --secondary: #f2f2f2;
+  --secondary-foreground: #0d0d0d;
+  --muted: #f4f4f5;
+  --muted-foreground: #6e6e80;
+  --accent: #eceefb;
+  --accent-foreground: #0d0d0d;
+  --destructive: #d92d20;
+  --border: #00000014;
+  /* Form controls are identified by their border alone, so it must clear WCAG 1.4.11 (3:1) against
+     the canvas; decorative dividers and card hairlines stay at --border (8% black). */
+  --input: #8a8a8a;
+  --ring: #5e6ad2;
+  --chart-1: #5e6ad2;
+  --chart-2: #4ea7fc;
+  --chart-3: #4cb782;
+  --chart-4: #f2c94c;
+  --chart-5: #eb5757;
+  --radius: 0.625rem; /* cards 10px; buttons and inputs 8px (radius-md) */
+  --sidebar: #f9f9f9;
+  --sidebar-foreground: #3f3f46;
+  --sidebar-primary: #5e6ad2;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #0000000a;
+  --sidebar-accent-foreground: #0d0d0d;
+  --sidebar-border: #ececec;
+  --sidebar-ring: #5e6ad2;
+  --subtle: #71717a;
+  --link: #4f5bc4;
+  --positive: #1a7f37;
+  --warning: #9a6700;
+  --info: #0969da;
+  /* Quantexa brand shares, borrowed for accents and the low-opacity abstract page art. */
+  --qx-navy: #002060;
+  --qx-magenta: #e20398;
+  --qx-mint: #19e5c0;
+  --qx-dark-teal: #0f4761;
+  --qx-violet: #3a1961;
+  --qx-plum: #1d0c30;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+@custom-variant data-open (&:where([data-state="open"], [data-open]:not([data-open="false"])));
+
+@custom-variant data-closed (&:where([data-state="closed"], [data-closed]:not([data-closed="false"])));
+
+@layer base {
+  body { font-size: 14px; -webkit-font-smoothing: antialiased; }
+}
+
+/* Markdown emitted by agents */
+.aui-md { font-size: 15px; line-height: 1.7; }
+.aui-md table:not(.podos-genui *) { font-size: 13px; border-collapse: collapse; margin: 0.75rem 0; width: 100%; }
+.aui-md th:not(.podos-genui *), .aui-md td:not(.podos-genui *) { border-bottom: 1px solid var(--border); padding: 0.5rem 0.625rem; text-align: left; vertical-align: top; }
+.aui-md th:not(.podos-genui *) { font-weight: 500; color: var(--muted-foreground); }
+
+/* Linear typography: Inter at 400 for text, 510 for controls, 590 for emphasis, 680 tight for
+   headings, with the cv01/ss03 character-set features Linear turns on. */
+@layer base {
+  html { font-feature-settings: "cv01", "ss03"; font-variation-settings: "opsz" auto; }
+  body { line-height: 1.5; font-weight: 400; }
+  h1, h2, h3 { text-wrap: balance; }
+  h1 { letter-spacing: -0.025em; font-weight: 680; }
+  h2, h3 { letter-spacing: -0.01em; }
+  strong, b { font-weight: 590; }
+  a { text-underline-offset: 3px; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+}
+@layer components {
+  /* Small labels: sentence case and muted (no tracked caps). */
+  .field-label { font-size: 12px; line-height: 1.4; font-weight: 510; color: var(--muted-foreground); }
+  .dossier-brand { display: flex; align-items: center; gap: 10px; color: var(--foreground); font-weight: 590; letter-spacing: -0.01em; }
+  .dossier-brand svg { width: 22px; height: 22px; color: #5e6ad2; }
+  .dossier-inverse { background: #0d0d0d; color: #ffffff; }
+  .dossier-inverse .field-label { color: #ffffffb0; }
+  .dossier-rule { border-top: 1px solid var(--border); }
+  [data-slot="sidebar-group-label"] { font-size: 12px; font-weight: 510; }
+  [data-slot="sidebar-menu-button"] { min-height: 28px; }
+  .podos-genui { font-family: var(--font-ui-sans), sans-serif; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+/* OpenUI follow-up actions read as quiet outline suggestions, matching the app's own Ask chips,
+   rather than solid near-black primary buttons inside an answer. Unlayered so it beats @layer openui. */
+.podos-genui .openui-button-base-primary {
+  background: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-color: var(--border);
+  box-shadow: none;
+}
+.podos-genui .openui-button-base-primary:not(:disabled):hover {
+  background: var(--secondary);
+  box-shadow: none;
+}

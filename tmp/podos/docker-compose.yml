@@ -1,0 +1,127 @@
+name: podos
+
+# Local data plane. Each service sits behind an adapter interface in apps/api so it
+# can be swapped for a managed equivalent (RDS/Cloud SQL, Amazon OpenSearch, S3/GCS,
+# corporate SMTP/Teams) without touching product code.
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "55432:5432"
+    volumes:
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+      - podos_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # Per-pod research indexes (research-<pod_id>) with index-scoped users/roles
+  # provisioned by scripts/provision.py. The security plugin is ON: the API never
+  # holds the admin credential, only one scoped credential per pod.
+  opensearch:
+    image: opensearchproject/opensearch:2.19.1
+    environment:
+      discovery.type: single-node
+      bootstrap.memory_lock: "false"
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: "Qv7#Lumen-Ridge-41x"
+      DISABLE_INSTALL_DEMO_CONFIG: "false"
+    ports:
+      - "59200:9200"
+    volumes:
+      - podos_os:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sk -u 'admin:Qv7#Lumen-Ridge-41x' https://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"'"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+
+  # S3-compatible artifact storage. One bucket, pod prefixes, one access key per pod
+  # whose IAM policy only allows pods/<pod_id>/*.
+  # Chainguard's build of MinIO (Docker Hub minio/minio is no longer published).
+  # MinIO server is AGPL-3.0: run unmodified as a separate service; swap for S3/GCS in production.
+  minio:
+    image: cgr.dev/chainguard/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: podos-root
+      MINIO_ROOT_PASSWORD: podos-root-secret-2026
+    ports:
+      - "59100:9000"
+      - "59101:9001"
+    volumes:
+      - podos_minio:/data
+
+  # Relationship-based authorization (Zanzibar-style). Every "may X do Y in pod P" decision
+  # is answered here; the model lives in infra/openfga/model.fga. Tuples are stored in its own
+  # Postgres database. Pre-shared key auth: only the Workspace API holds the key.
+  openfga-migrate:
+    image: openfga/openfga:latest
+    command: migrate
+    environment:
+      OPENFGA_DATASTORE_ENGINE: postgres
+      OPENFGA_DATASTORE_URI: postgres://openfga:openfga@postgres:5432/openfga?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  openfga:
+    image: openfga/openfga:latest
+    command: run
+    environment:
+      OPENFGA_DATASTORE_ENGINE: postgres
+      OPENFGA_DATASTORE_URI: postgres://openfga:openfga@postgres:5432/openfga?sslmode=disable
+      OPENFGA_AUTHN_METHOD: preshared
+      OPENFGA_AUTHN_PRESHARED_KEYS: podos-dev-fga-key-2026
+      OPENFGA_PLAYGROUND_ENABLED: "false"
+      OPENFGA_LOG_FORMAT: json
+    ports:
+      - "58080:8080"
+    depends_on:
+      openfga-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/grpc_health_probe", "-addr=localhost:8081"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  # Dev-only OpenFGA Playground against the same datastore. The built-in Playground
+  # refuses to start when authn is enabled, so this opt-in profile runs a second,
+  # unauthenticated server bound to loopback: http://localhost:3000/playground
+  # Start with: docker compose --profile openfga-ui up -d openfga-ui
+  openfga-ui:
+    image: openfga/openfga:latest
+    command: run
+    profiles: ["openfga-ui"]
+    environment:
+      OPENFGA_DATASTORE_ENGINE: postgres
+      OPENFGA_DATASTORE_URI: postgres://openfga:openfga@postgres:5432/openfga?sslmode=disable
+      OPENFGA_AUTHN_METHOD: "none"
+      OPENFGA_PLAYGROUND_ENABLED: "true"
+      OPENFGA_PLAYGROUND_ADDR: "0.0.0.0:3000"
+      OPENFGA_LOG_FORMAT: json
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      openfga-migrate:
+        condition: service_completed_successfully
+
+  # SMTP sink standing in for the corporate email channel. Web UI on :58025.
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "51025:1025"
+      - "58025:8025"
+
+volumes:
+  podos_pg:
+  podos_os:
+  podos_minio:

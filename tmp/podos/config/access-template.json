@@ -1,0 +1,65 @@
+{
+  "_comment": "Seed template for OpenFGA (infra/openfga/model.fga). Expanded per pod into relationship tuples at provisioning/seed time; after that, access is managed in the admin console and lives in OpenFGA. Entitlements only: release flags can narrow these, never widen them.",
+  "schema_version": "1.0",
+  "group_grants": {
+    "research_users": {
+      "agents": [
+        "auto-router",
+        "equity-research",
+        "filing-analyst",
+        "catalyst-monitor",
+        "entity-intelligence"
+      ],
+      "capabilities": [
+        "research.search",
+        "research.monitor.create",
+        "document.export.docx"
+      ],
+      "actions": [],
+      "datasets": [
+        "sec-edgar"
+      ],
+      "features": [
+        "event_triggers"
+      ]
+    },
+    "deck_builders": {
+      "agents": [],
+      "capabilities": [
+        "document.export.pptx"
+      ],
+      "actions": []
+    },
+    "approvers": {
+      "agents": [],
+      "capabilities": [],
+      "actions": [
+        "work_item.approve"
+      ]
+    }
+  },
+  "pod_wide_features": [
+    "briefing"
+  ],
+  "agent_service_grants": {
+    "auto-router": [],
+    "equity-research": [
+      "research.search",
+      "document.export.pptx",
+      "document.export.docx"
+    ],
+    "filing-analyst": [
+      "research.search",
+      "document.export.docx"
+    ],
+    "catalyst-monitor": [
+      "research.search"
+    ]
+  },
+  "workflow_service_grants": {
+    "podos-worker": [
+      "document.export.pptx",
+      "document.export.docx"
+    ]
+  }
+}

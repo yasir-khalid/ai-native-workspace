@@ -1,0 +1,24 @@
+{
+  "manifest": {
+    "schema_version": "1.0",
+    "agent_id": "auto-router",
+    "name": "Auto",
+    "description": "Routes a request to the best eligible specialist agent for the active pod. Only sees agents already filtered by entitlement and release policy.",
+    "owner_team": "ai-platform",
+    "implementation_version": "1.0.0",
+    "capabilities": [],
+    "allowed_tools": [],
+    "data_classification_ceiling": "restricted",
+    "publication_status": "ga",
+    "supported_run_modes": [
+      "interactive"
+    ],
+    "deployment": {
+      "protocol": "a2a",
+      "service_ref": "agent://auto-router/1.0.0",
+      "runtime_timeout_seconds": 60
+    },
+    "health_endpoint_ref": "agent://auto-router/1.0.0#card"
+  },
+  "kind": "router"
+}

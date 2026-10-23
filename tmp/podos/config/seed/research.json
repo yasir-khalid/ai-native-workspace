@@ -1,0 +1,77 @@
+{
+  "_comment": "Fictional issuers and research. Each pod's private material contains a canary marker (ALPHA-PRIVATE / BETA-PRIVATE) used by the isolation suite to detect leakage. Both pods research NWSC with different conclusions.",
+  "pods": {
+    "pod_alpha": {
+      "cases": [
+        {
+          "key": "nwsc",
+          "title": "Northwind Semiconductor: AI datacenter optics",
+          "thesis": "Long NWSC. 800G/1.6T optical transceiver ramp drives gross margin expansion to 48% by FY27; market underestimates hyperscaler capex durability.",
+          "tickers": ["NWSC"],
+          "owner": "alice.chen",
+          "documents": [
+            {"kind": "note", "title": "NWSC investment thesis v3", "ticker": "NWSC", "source": "Alpha internal note", "published_at": "2026-09-02T09:00:00Z", "author": "alice.chen",
+             "body": "Northwind Semiconductor (NWSC) thesis. We are long with a 12-month target price of 148 and current sizing of 3.5% NAV [ALPHA-PRIVATE-7f3a]. Core drivers: 1.6T transceiver qualification at two hyperscalers, silicon photonics yield improvement from 61% to 74%, and gross margin expansion toward 48% by FY27. Key risks: customer concentration (top two customers 58% of revenue), pricing pressure from Asian competitors, and inventory digestion if capex pauses."},
+            {"kind": "filing", "title": "NWSC 10-Q Q2 FY26 excerpt", "ticker": "NWSC", "source": "SEC EDGAR (mock)", "published_at": "2026-08-14T21:05:00Z", "author": "system",
+             "body": "Northwind Semiconductor 10-Q. Revenue 1.21bn up 34% year over year. Gross margin 44.1% versus 41.7% prior year. Management guidance: data center optics revenue expected to grow sequentially through FY26. Risk factors: added language on export control licensing for advanced optical modules to certain jurisdictions. Inventory rose 18% sequentially to support 1.6T ramp."},
+            {"kind": "transcript", "title": "NWSC Q2 earnings call notes", "ticker": "NWSC", "source": "Alpha analyst call notes", "published_at": "2026-08-15T13:30:00Z", "author": "arjun.patel",
+             "body": "Earnings call notes. CFO reiterated 1.6T volume shipments beginning in Q4. CEO described hyperscaler demand as supply constrained through mid-2027. Analyst view: tone was confident; capex commentary supports thesis. Watch item: second-source qualification at the largest customer slipped one quarter."},
+            {"kind": "model", "title": "NWSC model assumptions FY26-FY28", "ticker": "NWSC", "source": "Alpha model workbook", "published_at": "2026-09-05T10:00:00Z", "author": "arjun.patel",
+             "body": "Model assumptions: FY27 revenue 6.4bn, gross margin 47.8%, operating margin 29%, EPS 6.85. Bear case EPS 4.10 assumes capex pause and 1.6T delay. Bull case EPS 8.20. Valuation 21x FY27 EPS gives 144 to 148 target range."}
+          ]
+        },
+        {
+          "key": "lgs",
+          "title": "Lumen Grid Software: utility SaaS",
+          "thesis": "Short LGS. Net revenue retention decelerating; billings optics flattered by multi-year prepayments.",
+          "tickers": ["LGS"],
+          "owner": "arjun.patel",
+          "documents": [
+            {"kind": "note", "title": "LGS short thesis", "ticker": "LGS", "source": "Alpha internal note", "published_at": "2026-07-20T09:00:00Z", "author": "arjun.patel",
+             "body": "Lumen Grid Software (LGS) short thesis. Net revenue retention fell from 121% to 109% over four quarters. Billings growth is flattered by multi-year prepayments from municipal utilities. Borrow cost is 0.6% [ALPHA-PRIVATE-91c2]. Catalyst: Q3 print and potential guidance cut."},
+            {"kind": "filing", "title": "LGS 8-K CFO transition", "ticker": "LGS", "source": "SEC EDGAR (mock)", "published_at": "2026-09-18T20:15:00Z", "author": "system",
+             "body": "Lumen Grid Software 8-K. Chief Financial Officer resigned effective immediately to pursue other opportunities. Interim CFO appointed from the controller function. Company reaffirmed prior guidance."}
+          ]
+        }
+      ]
+    },
+    "pod_beta": {
+      "cases": [
+        {
+          "key": "hlxt",
+          "title": "Helix Therapeutics: Phase III readout",
+          "thesis": "Event-driven long HLXT into Phase III HX-201 readout and PDUFA; probability of approval 70%.",
+          "tickers": ["HLXT"],
+          "owner": "bianca.rossi",
+          "documents": [
+            {"kind": "note", "title": "HLXT event thesis", "ticker": "HLXT", "source": "Beta internal note", "published_at": "2026-09-10T09:00:00Z", "author": "bianca.rossi",
+             "body": "Helix Therapeutics (HLXT) event-driven long. Position 2.1% NAV with defined downside hedge via puts [BETA-PRIVATE-4d8e]. PDUFA date 14 November 2026 for HX-201 in moderate-to-severe atopic dermatitis. We estimate probability of approval at 70% and peak sales of 2.4bn."},
+            {"kind": "filing", "title": "HLXT 8-K topline Phase III", "ticker": "HLXT", "source": "SEC EDGAR (mock)", "published_at": "2026-09-22T12:00:00Z", "author": "system",
+             "body": "Helix Therapeutics 8-K. HX-201 Phase III met primary endpoint EASI-75 at week 16 (p<0.001). Discontinuation due to adverse events 3.2% versus 2.9% placebo. Company will present full data at a medical meeting."}
+          ]
+        },
+        {
+          "key": "nwsc-beta",
+          "title": "Northwind Semiconductor: supply chain read-through",
+          "thesis": "Neutral. Tracking NWSC only for read-through on medical imaging optics suppliers.",
+          "tickers": ["NWSC"],
+          "owner": "ben.okafor",
+          "documents": [
+            {"kind": "note", "title": "NWSC read-through for medtech optics", "ticker": "NWSC", "source": "Beta internal note", "published_at": "2026-08-30T09:00:00Z", "author": "ben.okafor",
+             "body": "Northwind Semiconductor read-through. Beta view: NWSC capacity prioritisation toward hyperscalers could tighten supply for medical imaging optical components. We hold no NWSC position; watching for allocation commentary [BETA-PRIVATE-c51b]. Contrarian view: optics pricing likely to fall 15% in 2027."}
+          ]
+        }
+      ]
+    }
+  },
+  "monitors": [
+    {"pod_id": "pod_alpha", "owner": "alice.chen", "name": "NWSC + LGS filings watch", "tickers": ["NWSC", "LGS"], "event_types": ["filing"], "keywords": ["guidance", "resign", "export control", "impairment", "restatement"], "schedule_seconds": 300, "approval_recipient": "alice.chen", "notify": ["alice.chen", "arjun.patel"]},
+    {"pod_id": "pod_beta", "owner": "bianca.rossi", "name": "HLXT regulatory catalysts", "tickers": ["HLXT"], "event_types": ["filing"], "keywords": ["FDA", "PDUFA", "complete response", "adverse", "approval"], "schedule_seconds": 300, "approval_recipient": "bianca.rossi", "notify": ["bianca.rossi", "ben.okafor"]}
+  ],
+  "simulated_filings": {
+    "pod_alpha": {"kind": "filing", "title": "NWSC 8-K guidance update", "ticker": "NWSC", "source": "SEC EDGAR (mock feed)",
+                  "body": "Northwind Semiconductor 8-K. Company raises FY26 revenue guidance to 4.9bn from 4.6bn citing accelerated 1.6T transceiver demand. Separately discloses that an export control license for advanced optical modules to one jurisdiction remains pending."},
+    "pod_beta": {"kind": "filing", "title": "HLXT 8-K FDA communication", "ticker": "HLXT", "source": "SEC EDGAR (mock feed)",
+                 "body": "Helix Therapeutics 8-K. FDA informed the company that the advisory committee for HX-201 is no longer planned; PDUFA date of 14 November 2026 unchanged. No new adverse event signals identified in the safety update."}
+  }
+}

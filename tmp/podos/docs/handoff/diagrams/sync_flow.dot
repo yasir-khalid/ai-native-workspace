@@ -1,0 +1,20 @@
+digraph flow {
+ graph [rankdir=TB,bgcolor=white,pad=.18,ranksep=.40,nodesep=.28,fontname="DejaVu Sans",splines=ortho];
+ node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,color="#9db1c9",fillcolor="#f4f7fb",fontcolor="#1b3048",margin=".18,.12"];
+ edge [color="#557ca5",penwidth=1.1,arrowsize=.7];
+ user[label="PM/Analyst\nChoose pod + agent",fillcolor="#e8eef7"];
+ verify[label="Verify session\nand pod membership"];
+ filter[label="Filter agents\nby rights + release"];
+ mode[label="Direct? / Auto?",shape=diamond,style="filled",fillcolor="#dce9fa"];
+ direct[label="Resolve selected\nagent deployment"];
+ auto[label="ADK Auto routes\nwithin eligible set"];
+ check[label="Repeat policy check\nat invocation"];
+ invoke[label="A2A / local ADK\nscoped execution",fillcolor="#e2f3e8"];
+ stream[label="AG-UI/SSE stream\nPersist thread + artifacts",fillcolor="#e5edf8"];
+ user -> verify -> filter -> mode;
+ mode -> direct [label="direct",fontsize=9];
+ mode -> auto [label="auto",fontsize=9];
+ direct -> check;
+ auto -> check;
+ check -> invoke -> stream;
+}

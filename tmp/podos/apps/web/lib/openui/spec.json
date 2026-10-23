@@ -1,0 +1,52 @@
+{
+  "_comment": "Single source of truth for generative UI (OpenUI Lang). The web renderer (lib/openui/library.ts) and the agent system prompt (scripts/openui-prompt.mjs -> config/openui/system-prompt.md) are both derived from this file. Components that can load external resources (Image*, ListItem images, markdown images) or collect input (forms) are deliberately excluded.",
+  "keep": [
+    "Stack",
+    "Card",
+    "CardHeader",
+    "TextContent",
+    "Callout",
+    "TextCallout",
+    "Separator",
+    "Table",
+    "Col",
+    "BarChart",
+    "LineChart",
+    "AreaChart",
+    "HorizontalBarChart",
+    "Series",
+    "PieChart",
+    "Slice",
+    "SingleStackedBarChart",
+    "RadarChart",
+    "Tabs",
+    "TabItem",
+    "TagBlock",
+    "Tag",
+    "Steps",
+    "StepsItem",
+    "Buttons",
+    "Button",
+    "Text",
+    "BoldText",
+    "IconText",
+    "Icon",
+    "MetricIndicatorInline",
+    "OverviewCardItem",
+    "OverviewCardBlock"
+  ],
+  "preamble": "You can add an interactive visualization to an answer using openui-lang, a compact declarative UI language rendered by the PodOS chat.",
+  "rules": [
+    "Always write the answer itself in markdown first, with [n] citations, exactly as you would without visualizations.",
+    "Add ONE ```openui-lang fenced block AFTER the text only when it genuinely helps: scenarios or estimates (BarChart), trends over time (LineChart), comparisons across companies or filings (Table or HorizontalBarChart), mixes (PieChart), or headline KPIs (OverviewCardBlock). Plain qualitative answers get no block.",
+    "Never show the same data twice: if the block has a table or chart, don't also write it as a markdown table or list; the text should interpret it (what it means, what to watch), not repeat it.",
+    "Every number in a visualization must appear in the sources you cited. Never invent, interpolate or estimate values to fill a chart. If the sources don't have enough numbers, don't draw a chart.",
+    "Give every chart a CardHeader title that names the metric, unit and period, and include the citation markers in that title or a TextContent caption, e.g. \"FY27 EPS by scenario (USD) [2]\".",
+    "Never use @OpenUrl, images, or links. Buttons may only use @ToAssistant with a short follow-up question.",
+    "Keep blocks small: at most one Card with one chart or table, plus up to 3 follow-up Buttons. root must be a Stack."
+  ],
+  "examples": [
+    "root = Stack([card, follow])\ncard = Card([header, chart, note])\nheader = CardHeader(\"FY27 EPS by scenario (USD) [1]\")\nchart = BarChart([\"Bear\", \"Base\", \"Bull\"], [Series(\"FY27 EPS\", [4.10, 6.85, 8.20])])\nnote = TextContent(\"Bear assumes a capex pause and a 1.6T delay [1].\", \"small\")\nfollow = Buttons([Button(\"What drives the bull case?\", @ToAssistant(\"What drives the bull case?\")), Button(\"Stress-test the bear case\", @ToAssistant(\"Stress-test the bear case\"))])",
+    "root = Stack([card])\ncard = Card([header, table])\nheader = CardHeader(\"Q2 FY26 vs prior year [2]\")\ntable = Table([Col(\"Metric\", [\"Revenue\", \"Gross margin\"]), Col(\"Q2 FY26\", [\"1.21bn\", \"44.1%\"]), Col(\"Q2 FY25\", [\"0.90bn\", \"41.7%\"])])"
+  ]
+}

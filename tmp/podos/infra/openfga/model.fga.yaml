@@ -1,0 +1,87 @@
+# Model tests: `make fga-test` (runs `fga model test` in the openfga/cli container).
+name: PodOS authorization model
+model_file: ./model.fga
+
+tuples:
+  - {user: user:alice, relation: pm, object: pod:alpha}
+  - {user: user:arjun, relation: analyst, object: pod:alpha}
+  - {user: user:dana, relation: analyst, object: pod:alpha}
+  - {user: user:dana, relation: analyst, object: pod:beta}
+  - {user: user:ben, relation: analyst, object: pod:beta}
+  - {user: platform:podos, relation: platform, object: pod:alpha}
+  - {user: user:pat, relation: admin, object: platform:podos}
+
+  - {user: pod:alpha, relation: pod, object: group:alpha/research_users}
+  - {user: user:arjun, relation: member, object: group:alpha/research_users}
+  - {user: user:dana, relation: member, object: group:alpha/research_users}
+  - {user: pod:beta, relation: pod, object: group:beta/research_users}
+  - {user: user:ben, relation: member, object: group:beta/research_users}
+  - {user: user:dana, relation: member, object: group:beta/research_users}
+
+  - {user: pod:alpha, relation: pod, object: agent:alpha/equity-research}
+  - {user: group:alpha/research_users#member, relation: grantee, object: agent:alpha/equity-research}
+  - {user: pod:beta, relation: pod, object: agent:beta/equity-research}
+  - {user: group:beta/research_users#member, relation: grantee, object: agent:beta/equity-research}
+
+  # A mis-scoped grant: Beta's group named on an Alpha object. Must only match live Alpha members.
+  - {user: pod:alpha, relation: pod, object: agent:alpha/filing-analyst}
+  - {user: group:beta/research_users#member, relation: grantee, object: agent:alpha/filing-analyst}
+
+  - {user: pod:alpha, relation: pod, object: capability:alpha/document.export.pptx}
+  - {user: user:alice, relation: grantee, object: capability:alpha/document.export.pptx}
+  - user: user:arjun
+    relation: grantee
+    object: capability:alpha/document.export.pptx
+    condition: {name: not_expired, context: {expires_at: "2026-11-01T00:00:00Z"}}
+
+  - {user: pod:alpha, relation: pod, object: feature:alpha/briefing}
+  - {user: pod:alpha#member, relation: grantee, object: feature:alpha/briefing}
+
+  - {user: user:alice, relation: approver, object: pod:alpha}
+  - {user: user:ben, relation: approver, object: pod:alpha}   # not an Alpha member
+
+  - {user: service:equity-research, relation: caller, object: tool:document.export.pptx}
+
+tests:
+  - name: membership and roles
+    check:
+      - {user: user:alice, object: pod:alpha, assertions: {member: true, can_read_restricted: true, can_approve: true}}
+      - {user: user:arjun, object: pod:alpha, assertions: {member: true, can_read_restricted: false, can_approve: false}}
+      - {user: user:ben, object: pod:alpha, assertions: {member: false, can_approve: false}}
+      - {user: user:pat, object: pod:alpha, assertions: {member: false, admin: true}}
+
+  - name: agent grants are pod-scoped
+    check:
+      - {user: user:arjun, object: agent:alpha/equity-research, assertions: {can_use: true}}
+      - {user: user:ben, object: agent:alpha/equity-research, assertions: {can_use: false}}
+      - {user: user:ben, object: agent:beta/equity-research, assertions: {can_use: true}}
+      - {user: user:alice, object: agent:alpha/equity-research, assertions: {can_use: false}}
+      - {user: user:pat, object: agent:alpha/equity-research, assertions: {can_use: false}}
+
+  - name: a mis-scoped grant never crosses pods
+    check:
+      - {user: user:ben, object: agent:alpha/filing-analyst, assertions: {can_use: false}}
+      # Dana is a member of both pods, so the grant only applies to her because she is in Alpha too.
+      - {user: user:dana, object: agent:alpha/filing-analyst, assertions: {can_use: true}}
+    list_objects:
+      - user: user:ben
+        type: agent
+        assertions: {can_use: [agent:beta/equity-research]}
+
+  - name: time-bound grants expire
+    check:
+      - user: user:arjun
+        object: capability:alpha/document.export.pptx
+        context: {current_time: "2026-10-20T00:00:00Z"}
+        assertions: {can_invoke: true}
+      - user: user:arjun
+        object: capability:alpha/document.export.pptx
+        context: {current_time: "2026-11-02T00:00:00Z"}
+        assertions: {can_invoke: false}
+
+  - name: pod-wide features and service grants
+    check:
+      - {user: user:dana, object: feature:alpha/briefing, assertions: {enabled_for: true}}
+      - {user: user:ben, object: feature:alpha/briefing, assertions: {enabled_for: false}}
+      - {user: service:equity-research, object: tool:document.export.pptx, assertions: {caller: true}}
+      - {user: service:filing-analyst, object: tool:document.export.pptx, assertions: {caller: false}}

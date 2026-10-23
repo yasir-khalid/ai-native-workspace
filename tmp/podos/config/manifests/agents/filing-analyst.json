@@ -1,0 +1,30 @@
+{
+  "manifest": {
+    "schema_version": "1.0",
+    "agent_id": "filing-analyst",
+    "name": "Filing Analyst",
+    "description": "Reads regulatory filings (10-Q, 10-K, 8-K) in the pod vault and extracts changes, risk-factor deltas and guidance language. Produces structured filing review tables.",
+    "owner_team": "research-ai",
+    "implementation_version": "1.0.0",
+    "capabilities": [
+      "research.search",
+      "document.export.docx"
+    ],
+    "allowed_tools": [
+      "research.search",
+      "capability.invoke"
+    ],
+    "data_classification_ceiling": "pod_confidential",
+    "publication_status": "pilot",
+    "supported_run_modes": [
+      "interactive"
+    ],
+    "deployment": {
+      "protocol": "a2a",
+      "service_ref": "agent://filing-analyst/1.0.0",
+      "runtime_timeout_seconds": 60
+    },
+    "health_endpoint_ref": "agent://filing-analyst/1.0.0#card"
+  },
+  "kind": "specialist"
+}

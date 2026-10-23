@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "revision": "2026-10-11.1",
+  "release_key": "catalyst-monitor-ga",
+  "kind": "agent",
+  "agent_id": "catalyst-monitor",
+  "agent_version": "1.0.0",
+  "stage": "GA",
+  "published": true,
+  "pod_allowlist": [
+    "pod_alpha",
+    "pod_beta"
+  ],
+  "eligible_groups": [
+    "research_users"
+  ],
+  "feature_flags": {
+    "catalogue_visible": true,
+    "direct_invoke": false,
+    "auto_route": false,
+    "background_execution": true,
+    "proactive_alerts": true,
+    "capability_enabled": false,
+    "emergency_disabled": false
+  },
+  "user_fraction_percent": 100,
+  "stable_salt_id": "catalyst-monitor-ga-2026q4",
+  "runtime_canary": {
+    "stable_version": "1.0.0",
+    "candidate_version": null,
+    "candidate_fraction_percent": 0
+  },
+  "notes": "Background monitor"
+}

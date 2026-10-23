@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/release-policy.schema.json",
+  "title": "ReleasePolicy",
+  "description": "Extends contracts/release-policy.example.json with kind (agent|capability), stage and capability_enabled.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "revision", "release_key", "kind", "stage", "published", "pod_allowlist", "feature_flags", "stable_salt_id"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "revision": {"type": "string", "minLength": 1},
+    "release_key": {"type": "string", "pattern": "^[a-z][a-z0-9_.-]{2,99}$"},
+    "kind": {"enum": ["agent", "capability"]},
+    "agent_id": {"type": ["string", "null"]},
+    "capability_id": {"type": ["string", "null"]},
+    "agent_version": {"type": ["string", "null"]},
+    "stage": {"enum": ["DRAFT", "SHADOW", "POD_PILOT_DIRECT", "POD_PILOT_AUTO", "MULTIPOD", "GA", "PAUSED", "DISABLED", "ROLLED_BACK"]},
+    "published": {"type": "boolean"},
+    "pod_allowlist": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "eligible_groups": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "feature_flags": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "catalogue_visible": {"type": "boolean"},
+        "direct_invoke": {"type": "boolean"},
+        "auto_route": {"type": "boolean"},
+        "background_execution": {"type": "boolean"},
+        "proactive_alerts": {"type": "boolean"},
+        "capability_enabled": {"type": "boolean"},
+        "emergency_disabled": {"type": "boolean"}
+      }
+    },
+    "user_fraction_percent": {"type": "integer", "minimum": 0, "maximum": 100},
+    "stable_salt_id": {"type": "string", "minLength": 3},
+    "runtime_canary": {
+      "type": ["object", "null"], "additionalProperties": false,
+      "required": ["stable_version"],
+      "properties": {
+        "stable_version": {"type": "string"},
+        "candidate_version": {"type": ["string", "null"]},
+        "candidate_fraction_percent": {"type": "integer", "minimum": 0, "maximum": 100}
+      }
+    },
+    "notes": {"type": "string"}
+  }
+}

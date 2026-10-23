@@ -1,0 +1,8 @@
+[
+  {"_comment": "Pull: SEC EDGAR MCP server (mock locally; run podos_connectors.serve --mode sec for live data).",
+   "connector_id": "sec-edgar", "dataset_id": "sec-edgar", "transport": "mcp", "event_type": "filing",
+   "url": "http://127.0.0.1:8421/mcp", "poll_tool": "latest_filings", "interval_seconds": 15, "forms": ["8-K", "10-Q", "10-K"]},
+  {"_comment": "Push: newswire posts signed batches to /v1/connectors/newswire/events.",
+   "connector_id": "newswire", "dataset_id": "market-news", "transport": "webhook", "event_type": "news",
+   "secret_ref": "connector:newswire"}
+]

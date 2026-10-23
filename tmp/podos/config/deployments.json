@@ -1,0 +1,7 @@
+[
+  {"agent_id": "auto-router", "implementation_version": "1.0.0", "environment": "local", "service_ref": "agent://auto-router/1.0.0", "protocol": "a2a", "healthy": true},
+  {"agent_id": "equity-research", "implementation_version": "1.0.0", "environment": "local", "service_ref": "agent://equity-research/1.0.0", "protocol": "a2a", "healthy": true},
+  {"agent_id": "filing-analyst", "implementation_version": "1.0.0", "environment": "local", "service_ref": "agent://filing-analyst/1.0.0", "protocol": "a2a", "healthy": true},
+  {"agent_id": "filing-analyst", "implementation_version": "1.1.0", "environment": "local", "service_ref": "agent://filing-analyst/1.1.0", "protocol": "a2a", "healthy": true},
+  {"agent_id": "catalyst-monitor", "implementation_version": "1.0.0", "environment": "local", "service_ref": "agent://catalyst-monitor/1.0.0", "protocol": "a2a", "healthy": true}
+]

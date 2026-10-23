@@ -1,0 +1,29 @@
+digraph architecture {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.37", ranksep="0.52", fontname="DejaVu Sans", splines=ortho];
+  node [fontname="DejaVu Sans", fontsize=12, shape=box, style="rounded,filled", color="#a6b8ca", fillcolor="#f4f7fb", fontcolor="#1e3047", penwidth=1.1, margin="0.20,0.11"];
+  edge [color="#68829b", arrowsize=.8, penwidth=1.25];
+  employees [label="PMs / Pod Analysts / Central Teams",fillcolor="#ebf0f7"];
+  ui [label="One AI Workspace\nAsk | Research Vault | Monitor | Inbox | My Work | Agents", fillcolor="#dce9fa", fontsize=14, penwidth=1.5];
+  api [label="FastAPI Workspace API\nTrusted Pod Context | Threads | Work Items | Artifacts",fillcolor="#e5eefb"];
+  policies [label="Control Plane\nRegistry | Capabilities | Entitlements | Rollouts",fillcolor="#e5eefb"];
+  subgraph cluster_alpha {
+    label="Private Pod Alpha"; fontname="DejaVu Sans"; fontsize=13; color="#98b9e4"; style="rounded,filled"; fillcolor="#f4f8fe";
+    alpha [label="Alpha research\nAlpha memory\nAlpha inbox & runs\nAlpha credentials",fillcolor="white"];
+  }
+  subgraph cluster_beta {
+    label="Private Pod Beta"; fontname="DejaVu Sans"; fontsize=13; color="#99cbbb"; style="rounded,filled"; fillcolor="#f4fcf7";
+    beta [label="Beta research\nBeta memory\nBeta inbox & runs\nBeta credentials",fillcolor="white"];
+  }
+  shared [label="Shared executable services\nADK / A2A Agents | MCP Tools | Document Capabilities",fillcolor="#edf3ef",fontsize=12];
+  substrate [label="Shared infrastructure, logically/physically scoped\nPostgres RLS | Per-pod OpenSearch | Object Storage | K8s | IAM",fillcolor="#f2f4f7"];
+  employees -> ui -> api;
+  api -> policies [dir=both];
+  api -> alpha;
+  api -> beta;
+  policies -> shared;
+  shared -> alpha [dir=both];
+  shared -> beta [dir=both];
+  {rank=same;alpha;beta}
+  alpha -> substrate;
+  beta -> substrate;
+}

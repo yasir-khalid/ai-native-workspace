@@ -1,0 +1,9 @@
+{
+  "_comment": "Service directory: logical service_ref -> network endpoint. Agents run as separate processes (scripts/dev.sh).",
+  "agent://auto-router/1.0.0": "http://127.0.0.1:8415",
+  "agent://equity-research/1.0.0": "http://127.0.0.1:8411",
+  "agent://filing-analyst/1.0.0": "http://127.0.0.1:8412",
+  "agent://filing-analyst/1.1.0": "http://127.0.0.1:8413",
+  "agent://catalyst-monitor/1.0.0": "http://127.0.0.1:8414",
+  "agent://esg-screener/1.0.0": "http://127.0.0.1:8416"
+}
