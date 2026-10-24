@@ -115,6 +115,21 @@ uv run pytest tests/test_t12_call_chat.py tests/test_t2_agents.py tests/test_t8_
 (cd apps/web && npx --yes tsx --test tests/chat-sessions.test.ts)
 ```
 
+For structured external results and saved activity:
+
+```sh
+uv run pytest tests/test_result_presentation.py tests/test_t11_external_a2a.py -q
+(cd apps/web && npx tsx --test tests/chat-sessions.test.ts tests/result-cards.test.ts)
+```
+
+These cover typed court data, rejected unsafe links, malformed-result fallback,
+duplicate artifact snapshots, server-owned source labels, persisted results and
+activity, owner/pod isolation, and actual OpenUI rendering of nullable slot prices
+and distances. Browser checks should confirm a real court result
+renders a card, booking links retain the provider URL, **Activity** expands after
+completion and reload, the full response remains available, and 390px layouts do
+not overflow. Existing research charts/tables must continue to render.
+
 The 23–24 October chat implementation pass recorded **28 backend tests** and
 **five session tests** passing, plus lint, type checking, production build and
 manual browser checks. These are scoped results, not the full repository total.

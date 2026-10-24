@@ -103,9 +103,43 @@ Kepler references are in [CALLS_CITATION_UX_EVALUATION.md](CALLS_CITATION_UX_EVA
   question. Stop is an explicit cancel action; navigation does not send cancel.
 - Suggested questions remain; the cross-pod test suggestion has been removed.
 
+## Structured results and retained activity
+
+Sportscanner's named `court_availability` A2A artifact is normalized into a bounded
+`ui.result` event. The existing OpenUI renderer fills an allowlisted court component
+with venue, address, distance, date, times, GBP prices, freshness and explicit
+provider booking links. Values come from the artifact without a second model pass.
+Malformed results fall back to the ordinary answer; links must be public HTTPS.
+The original answer remains available under **Full response and caveats**.
+
+The design follows [OpenUI's component library approach](https://www.openui.com/docs/openui-lang/defining-components)
+and [CopilotKit's controlled generative UI pattern](https://www.copilotkit.ai/generative-ui).
+OpenUI was already installed for research charts/tables. This adds a controlled
+renderer for external results; it does not install a second CopilotKit chat runtime.
+New result types require their own schema, adapter and allowlisted component.
+GBP numbers and explicit formatted amounts such as `£12.80` are normalized without
+parsing explanatory prose. A venue-level fallback is labeled **From**; missing
+amounts remain **Price on provider site**.
+
+**Activity** stays collapsed after completion and can be expanded. It shows the
+agent's visible tool actions and reported progress, with elapsed time when known;
+it does not expose private model reasoning. Saved answers reconstruct these parts
+from their pod-scoped durable run events, including older chats. Structured cards
+also survive reload. Older answers whose structured artifact was discarded need a
+fresh search to show cards; the UI does not invent venue data from saved prose.
+
 ## Verification
 
-Validation: 28 backend tests and five browser-session model tests pass; TypeScript,
+The structured-card/activity pass on 24 October recorded **140 backend tests
+passing, five opt-in tests skipped**, and **eight web tests passing**, plus lint,
+type checking and the production build. The focused external/result suite passed
+again after the GBP normalization fix. Live browser checks verified Auto routing,
+the provider's `£12.80` amount, booking URLs, extra-time expansion, completed activity,
+reload, background completion, older-chat activity and 390px/320px layouts without
+horizontal overflow. All 33 existing themed Mermaid diagrams rendered successfully.
+
+The earlier evidence/background-answer pass recorded 28 backend tests and five
+browser-session model tests passing; TypeScript,
 targeted lint and the production build pass. The existing Next.js build reports a
 security advisory for the installed framework version; upgrading it remains separate
 from this change.

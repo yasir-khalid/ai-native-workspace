@@ -82,6 +82,13 @@ renderers produce DOCX/PPTX artifacts and keep binaries out of model context.
 
 ## Contracts and registration
 
+External agents may return a named `court_availability` artifact containing a JSON
+array of venues and slots. `podos_api.presentation` validates/bounds it, and the A2A
+adapter emits a deduplicated `ui.result`. The API stamps the registered agent name
+as its source and persists it in the ordinary run log. Unknown result types are
+not executable UI. See [chat rendering](CHAT_EVIDENCE_IMPLEMENTATION.md#structured-results-and-retained-activity)
+for the component contract and saved-answer behavior.
+
 - Agent manifests: `config/manifests/agents/` and the contracts package.
 - Deployment endpoint mapping: `config/endpoints.local.json` for local services.
 - A2A serving: `agents/podos_agents/serve.py` and the Agent Card.
@@ -184,6 +191,7 @@ inspector, with an explicit **Open original** action when an HTTP(S) URL exists.
 | `sources.available` | Early per-answer source registry for streaming references |
 | Final `citations` | Used to persist the final citation snapshot on completion |
 | External verification status | Display as the external agent's own reported check |
+| `court_availability` JSON artifact | Validated `ui.result`, controlled OpenUI cards, persisted for reload |
 | Failed transport/task | Run failure; only internal agents can fall back to another eligible internal agent |
 
 The API normalizes A2A output into its own SSE protocol. This is not a certified

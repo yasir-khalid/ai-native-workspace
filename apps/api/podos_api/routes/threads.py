@@ -72,6 +72,27 @@ async def get_thread(thread_id: str, ctx: PodContext = Depends(pod_ctx_from_head
                WHERE pod_id = %s AND thread_id = %s ORDER BY created_at""",
             (ctx.active_pod_id, t["thread_id"]),
         )
+        # Rebuild presentation from the durable event log, including chats created before
+        # saved messages retained activity. Ownership and pod scope were checked above.
+        run_ids = [m["run_id"] for m in msgs if m["role"] == "assistant" and m["run_id"]]
+        if run_ids:
+            events = await fetchall(
+                conn,
+                """SELECT run_id, sequence, event_type, payload, occurred_at FROM run_events
+                   WHERE pod_id = %s AND run_id = ANY(%s)
+                     AND event_type = ANY(%s) ORDER BY run_id, sequence""",
+                (ctx.active_pod_id, run_ids, ["run.started", "agent.selected", "tool.started", "tool.completed",
+                                            "ui.result", "run.completed", "run.failed"]),
+            )
+            by_run: dict[str, list[dict]] = {}
+            for event in events:
+                by_run.setdefault(str(event["run_id"]), []).append({
+                    **event["payload"], "type": event["event_type"], "sequence": event["sequence"],
+                    "timestamp": event["occurred_at"].isoformat(), "run_id": str(event["run_id"]),
+                })
+            for message in msgs:
+                if message["role"] == "assistant":
+                    message["content"] = {**message["content"], "activity": by_run.get(str(message["run_id"]), [])}
         runs = await fetchall(
             conn,
             """SELECT run_id, state, agent_id, mode FROM agent_runs WHERE pod_id = %s AND thread_id = %s

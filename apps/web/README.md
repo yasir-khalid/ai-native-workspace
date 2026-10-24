@@ -110,6 +110,7 @@ the server remains the run owner. Reopening an active chat replays ordered event
 | Fresh question handoffs | `lib/ask-handoff.ts` and the ask route client |
 | Transcript and audio | `components/calls/`, `lib/calls.ts`, `lib/transcript-reader.ts` |
 | OpenUI component contract | `lib/openui/spec.json` and `scripts/openui-prompt.mjs` |
+| Controlled external result cards | `lib/ui-results.ts`, `components/ask/result-cards.tsx` |
 | UI primitives | `components/ui/`, `components/assistant-ui/` |
 
 There are no standalone Agents/Admin routes in the current app. Monitors and
@@ -119,6 +120,11 @@ screenshots as a current route specification.
 ## Rendering rules
 
 - Render only pod-scoped API responses; UI selection is not authorization.
+- Render validated `ui.result` data through allowlisted OpenUI components. Court
+  cards use provider values directly, public HTTPS booking links, and no automatic
+  navigation or bookings. Preserve the original response in its disclosure.
+- Restore completed activity and result cards from saved run events. Keep visible
+  execution summaries expandable; do not describe them as private model reasoning.
 - Preserve sentence IDs and source snapshots when changing transcript presentation.
 - Source reference numbers belong to one answer, not a global namespace.
 - Early source registries resolve inline references; final cited-only snapshots

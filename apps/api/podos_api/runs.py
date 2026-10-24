@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 log = logging.getLogger("podos.runs")
 
-ALLOWED_AGENT_EVENTS = {"tool.started", "tool.completed", "citations", "sources.available", "status"}
+ALLOWED_AGENT_EVENTS = {"tool.started", "tool.completed", "citations", "sources.available", "status", "ui.result"}
 FALLBACK_CODES = {"agent_unreachable", "agent_timeout", "agent_call_failed", "agent_card_mismatch", "agent_unhealthy"}
 
 
@@ -351,6 +351,8 @@ class RunManager:
                         if value["type"] == "citations":
                             citations = [c for c in value.get("items", []) if isinstance(c, dict)][:200]
                         else:
+                            if value["type"] == "ui.result":
+                                value = {**value, "result": {**value["result"], "source": av.name}}
                             await self.emit(pod, run_id, value["type"], {k: v for k, v in value.items() if k != "type"})
                     elif kind == "state" and value == "failed":
                         raise AgentCallError("agent_reported_failure", "agent reported a failure")

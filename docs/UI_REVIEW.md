@@ -162,6 +162,16 @@ Agents/Admin web screens and their screenshot affordances are historical.
 
 ## External A2A agent in the UI
 
+Court availability renders through the existing OpenUI library as controlled
+shadcn cards. Dates/times, GBP prices, address/distance, freshness and **View booking**
+links are readable independently of the original prose. Long result sets and extra
+slots expand explicitly. Original wording and caveats remain in a disclosure.
+The UI uses source data, not another model's interpretation of prices or slots.
+
+Completed answers keep an expandable **Activity** group. Saved chats restore the
+same public tool steps and duration from durable events. Agent labels remain visible
+after reload. This is an execution summary, not a private reasoning trace.
+
 External agent activity can include progress and self-reported verification. These
 are agent reports, not independent validation. Public-source citations use the same
 evidence inspector and an explicit Open original link when a usable HTTP(S) URL

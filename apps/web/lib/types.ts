@@ -81,6 +81,7 @@ export type StoredMessage = {
     agent_version?: string;
     citations?: Citation[];
     artifacts?: ArtifactRef[];
+    activity?: RunEvent[];
   };
   run_id: string | null;
   created_at: string;

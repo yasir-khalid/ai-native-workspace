@@ -19,6 +19,7 @@ SPORT_PORT = _free_port()
 def external_agent():
     """The third-party agent, started as its own service (not part of the PodOS stack)."""
     import mock_external_agent
+    from test_result_presentation import COURTS
 
     server = _Server(mock_external_agent.build_app(EXT_PORT), EXT_PORT)
     server.start()
@@ -26,7 +27,8 @@ def external_agent():
     sport_server = _Server(mock_external_agent.build_app(
         SPORT_PORT, name="Sportscanner Court Finder",
         description="Find publicly bookable badminton, squash, pickleball, padel and tennis courts in London. "
-                    "Search available sports court slots by location, date and time, with prices and booking links."), SPORT_PORT)
+                    "Search available sports court slots by location, date and time, with prices and booking links.",
+        result_data=COURTS), SPORT_PORT)
     sport_server.start()
     sport_server.wait()
     yield mock_external_agent
@@ -239,3 +241,22 @@ def test_external_input_required_reply_is_rendered_without_artifact():
     assert ("delta", "Which London postcode?") in events
     assert ("state", "input_required") in events
     assert not [e for e in stream.feed({"task": {"status": status}}) if e[0] == "delta"]
+
+
+async def test_result_cards_and_activity_are_available_after_reload(pat, external_agent, alice, ben):
+    await connect_sportscanner(pat)
+    yasir = await login("yasir.khalid")
+    try:
+        thread = await yasir.new_thread("pod_alpha")
+        _, events = await yasir.ask("pod_alpha", "Find badminton courts near E1 2AD", agent_id="sportscanner", thread_id=thread)
+        results = [e for e in events if e["type"] == "ui.result"]
+        assert len(results) == 1
+        assert results[0]["result"]["source"] == "Sportscanner Court Finder"
+        saved = (await yasir.get(f"/v1/threads/{thread}", pod="pod_alpha")).json()["messages"][-1]
+        activity = saved["content"]["activity"]
+        assert {"agent.selected", "tool.started", "tool.completed", "ui.result", "run.completed"} <= {e["type"] for e in activity}
+        assert next(e for e in activity if e["type"] == "ui.result")["result"] == results[0]["result"]
+        assert (await alice.get(f"/v1/threads/{thread}", pod="pod_alpha")).status_code == 404
+        assert (await ben.get(f"/v1/threads/{thread}", pod="pod_beta")).status_code == 404
+    finally:
+        await yasir.http.aclose()

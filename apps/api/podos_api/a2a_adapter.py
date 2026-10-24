@@ -33,6 +33,7 @@ from a2a.types import Role, SendMessageRequest
 from google.protobuf import json_format, struct_pb2
 
 from .governance import DeploymentRecord
+from .presentation import court_result
 from .settings import Settings
 
 PODOS_EVENT_MARKER = "podos_event"
@@ -202,6 +203,7 @@ class _GenericStream:
     def __init__(self) -> None:
         self.open_step: str | None = None
         self.answered = False
+        self.results_seen: set[str] = set()
 
     def _close_step(self) -> list[tuple[str, Any]]:
         if self.open_step is None:
@@ -235,8 +237,14 @@ class _GenericStream:
                 if "text" in part:
                     out.append(("delta", part["text"]))
                     self.answered = True
-                elif isinstance(part.get("data"), dict):
-                    out += _map_data_part(part["data"])
+                elif "data" in part:
+                    if art.get("artifact", {}).get("name") == "court_availability":
+                        result = court_result(part["data"])
+                        if result and result["id"] not in self.results_seen:
+                            self.results_seen.add(result["id"])
+                            out.append(("event", {"type": "ui.result", "result": result}))
+                    elif isinstance(part["data"], dict):
+                        out += _map_data_part(part["data"])
         elif "message" in resp:  # agents that reply with a plain message instead of a task
             text = "".join(p.get("text", "") for p in resp["message"].get("parts", []))
             if text:

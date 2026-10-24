@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FC, type PropsWithChildren } from "react";
-import type { ToolCallMessagePartComponent } from "@assistant-ui/react";
+import { useAuiState, type ToolCallMessagePartComponent } from "@assistant-ui/react";
 import {
   ArrowDownToLineIcon, BadgeCheckIcon, CheckIcon, ChevronDownIcon, CircleAlertIcon, FileTextIcon,
   LoaderCircleIcon, PresentationIcon, SearchIcon, ShieldXIcon, TriangleAlertIcon,
@@ -18,6 +18,7 @@ import { downloadArtifact, explain, shortDate } from "@/lib/api";
 import type { ArtifactRef, Citation } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { formatClock } from "@/lib/calls";
+import { ResultCards } from "./result-cards";
 
 const DENIAL: Record<string, string> = {
   scope_violation: "Blocked by the platform: that request reached outside this pod",
@@ -28,7 +29,6 @@ const DENIAL: Record<string, string> = {
 };
 
 function Route({ result }: { result: Record<string, unknown> }) {
-  if (result.persisted) return null;
   return (
     <div className="mb-2 flex items-center gap-2 text-[13px] text-muted-foreground">
       <AgentTile agentId={String(result.agent_id)} size="sm" />
@@ -68,7 +68,7 @@ function Activity({ name, args, result, isError }: { name: string; args: Record<
       className={cn("flex items-center gap-2 py-1 text-[13px]", isError ? "text-red-900" : warning ? "text-amber-900" : "text-muted-foreground")}
     >
       <Icon className={cn("size-3.5 shrink-0", tone)} />
-      <span className={cn("truncate", pending && "shimmer")}>{text}</span>
+      <span className={cn("min-w-0 whitespace-normal", pending && "shimmer")}>{text}</span>
     </div>
   );
 }
@@ -144,6 +144,8 @@ export const PodosToolPart: ToolCallMessagePartComponent = ({ toolName, args, re
   switch (toolName) {
     case "podos.route":
       return r ? <Route result={r} /> : null;
+    case "podos.result":
+      return <ResultCards result={result} />;
     case "podos.artifact":
       return r ? <FileCard artifact={r as unknown as ArtifactRef} /> : null;
     case "podos.registry":
@@ -165,17 +167,19 @@ export const PodosToolPart: ToolCallMessagePartComponent = ({ toolName, args, re
  */
 export function ActivityGroup({ group, children }: PropsWithChildren<{ group: ThreadGroupPart }>) {
   const running = group.status?.type === "running";
+  const savedDuration = useAuiState(s => s.message.metadata.custom.activityDurationMs);
   const steps = group.indices.length;
   const [open, setOpen] = useState(running);
   const userToggled = useRef(false);
   useEffect(() => {
     if (!userToggled.current) setOpen(running);
   }, [running]);
-  const seconds =
-    group.timing?.completedAt !== undefined
+  const seconds = typeof savedDuration === "number"
+    ? Math.max(1, Math.round(savedDuration / 1000))
+    : group.timing?.completedAt !== undefined
       ? Math.max(1, Math.round((group.timing.completedAt - group.timing.startedAt) / 1000))
       : undefined;
-  const label = running ? "Thinking…" : seconds !== undefined ? `Thought for ${seconds}s` : "Activity";
+  const label = running ? "Working…" : seconds !== undefined ? `Activity · ${seconds}s` : "Activity";
   return (
     <ToolGroupRoot
       variant="ghost"

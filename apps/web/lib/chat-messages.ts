@@ -1,5 +1,6 @@
 import type { ThreadMessageLike } from "@assistant-ui/react";
 import type { RunEvent, StoredMessage } from "./types";
+import { courtResultSchema } from "./ui-results";
 
 type Segment =
   | { kind: "text"; text: string }
@@ -14,6 +15,8 @@ export type UiMessage = {
   createdAt: Date;
   runId?: string;
   callId?: string | null;
+  startedAt?: number;
+  durationMs?: number;
 };
 
 export type AskSelection = { mode: "auto" | "direct"; agentId: string | null; caseId: string | null; callId?: string | null };
@@ -22,7 +25,13 @@ let seq = 0;
 export const uid = (p: string) => `${p}-${Date.now().toString(36)}-${(seq++).toString(36)}`;
 
 export function convert(m: UiMessage): ThreadMessageLike {
-  const content = m.segments.map((s) =>
+  const resultParts = m.segments.filter(s => s.kind === "tool" && s.name === "podos.result" && courtResultSchema.safeParse(s.result).success);
+  const hasResults = resultParts.length > 0;
+  const ordinary = hasResults ? m.segments.filter(s => !resultParts.includes(s)) : m.segments;
+  const firstText = ordinary.findIndex(s => s.kind === "text");
+  const position = firstText < 0 ? ordinary.length : firstText;
+  const ordered = hasResults ? [...ordinary.slice(0, position), ...resultParts, ...ordinary.slice(position)] : ordinary;
+  const content = ordered.map((s) =>
     s.kind === "text"
       ? ({ type: "text", text: s.text } as const)
       : ({
@@ -39,7 +48,7 @@ export function convert(m: UiMessage): ThreadMessageLike {
     role: m.role,
     content: content.length ? content : [{ type: "text", text: "" }],
     createdAt: m.createdAt,
-    metadata: { custom: { callId: m.callId ?? null } },
+    metadata: { custom: { callId: m.callId ?? null, structuredResults: hasResults, activityDurationMs: m.durationMs } },
     status:
       m.role === "user"
         ? undefined
@@ -56,8 +65,13 @@ export function hydrate(stored: StoredMessage[]): UiMessage[] {
     if (m.role === "user") {
       return { id: m.message_id, role: "user", status: "complete", createdAt: new Date(m.created_at), callId: m.content.call_id, segments: [{ kind: "text", text: m.content.text }] };
     }
-    const segs: Segment[] = [];
-    if (m.content.agent_id) {
+    let replay: UiMessage = { id: m.message_id, role: "assistant", status: "complete", createdAt: new Date(m.created_at), segments: [] };
+    for (const event of m.content.activity ?? []) {
+      if (["run.started", "agent.selected", "tool.started", "tool.completed", "ui.result"].includes(event.type)) replay = applyEvent(replay, event);
+      if (event.type === "run.completed" && replay.startedAt && Number.isFinite(Date.parse(event.timestamp))) replay.durationMs = Math.max(0, Date.parse(event.timestamp) - replay.startedAt);
+    }
+    const segs = replay.segments;
+    if (m.content.agent_id && !segs.some(s => s.kind === "tool" && s.name === "podos.route")) {
       segs.push({
         kind: "tool", id: `${m.message_id}-route`, name: "podos.route", args: {},
         result: { agent_id: m.content.agent_id, name: m.content.agent_name, version: m.content.agent_version, persisted: true },
@@ -70,7 +84,7 @@ export function hydrate(stored: StoredMessage[]): UiMessage[] {
     if (m.content.citations?.length) {
       segs.push({ kind: "tool", id: `${m.message_id}-src`, name: "podos.sources", args: {}, result: m.content.citations });
     }
-    return { id: m.message_id, runId: m.run_id ?? undefined, role: "assistant", status: "complete", createdAt: new Date(m.created_at), callId: m.content.call_id, segments: segs };
+    return { ...replay, runId: m.run_id ?? undefined, callId: m.content.call_id, segments: segs };
   });
 }
 
@@ -78,6 +92,16 @@ export function applyEvent(msg: UiMessage, e: RunEvent): UiMessage {
   const segs = [...msg.segments];
   const last = segs[segs.length - 1];
   switch (e.type) {
+    case "run.started":
+      return { ...msg, startedAt: Number.isFinite(Date.parse(e.timestamp)) ? Date.parse(e.timestamp) : undefined };
+    case "ui.result": {
+      const result = courtResultSchema.safeParse(e.result);
+      if (!result.success) break;
+      const part = { kind: "tool" as const, id: result.data.id, name: "podos.result", args: {}, result: result.data };
+      const index = segs.findIndex(s => s.kind === "tool" && s.name === "podos.result" && s.id === part.id);
+      if (index < 0) segs.push(part); else segs[index] = part;
+      break;
+    }
     case "agent.selected":
       segs.push({ kind: "tool", id: `route-${e.sequence}`, name: "podos.route", args: {}, result: e });
       break;
@@ -116,7 +140,7 @@ export function applyEvent(msg: UiMessage, e: RunEvent): UiMessage {
       const cites = (e.citations as unknown[]) ?? [];
       for (let i = segs.length - 1; i >= 0; i--) if (segs[i].kind === "tool" && ["podos.sources", "podos.registry"].includes((segs[i] as { name: string }).name)) segs.splice(i, 1);
       if (cites.length) segs.push({ kind: "tool", id: `src-${e.sequence}`, name: "podos.sources", args: {}, result: cites });
-      return { ...msg, segments: segs, status: "complete" };
+      return { ...msg, segments: segs, status: "complete", durationMs: msg.startedAt && Number.isFinite(Date.parse(e.timestamp)) ? Math.max(0, Date.parse(e.timestamp) - msg.startedAt) : msg.durationMs };
     }
     case "run.failed":
     case "stream.terminated":

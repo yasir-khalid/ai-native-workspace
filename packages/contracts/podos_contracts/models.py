@@ -275,6 +275,7 @@ RunEventType = Literal[
     "tool.started",
     "tool.completed",
     "artifact.created",
+    "ui.result",
     "approval.requested",
     "run.completed",
     "run.failed",

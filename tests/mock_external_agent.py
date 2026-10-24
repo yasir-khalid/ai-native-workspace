@@ -23,6 +23,9 @@ RECEIVED: list[dict[str, Any]] = []
 
 
 class EntityExecutor(AgentExecutor):
+    def __init__(self, result_data=None):
+        self.result_data = result_data
+
     async def execute(self, context: RequestContext, event_queue: EventQueue) -> None:
         msg = context.message
         RECEIVED.append({
@@ -50,6 +53,8 @@ class EntityExecutor(AgentExecutor):
              Part(data=struct_pb2.Value(struct_value=data))],
             name="answer",
         )
+        if self.result_data is not None:
+            await updater.add_artifact([Part(data=json_format.ParseDict(self.result_data, struct_pb2.Value()))], name="court_availability")
         await updater.complete()
 
     async def cancel(self, context: RequestContext, event_queue: EventQueue) -> None:  # pragma: no cover
@@ -57,7 +62,8 @@ class EntityExecutor(AgentExecutor):
 
 
 def build_app(port: int, *, name: str = "Mock Entity Intelligence",
-              description: str = "Answers questions about legal entities from public records (test double).") -> Starlette:
+              description: str = "Answers questions about legal entities from public records (test double).",
+              result_data=None) -> Starlette:
     card = AgentCard(
         name=name,
         description=description,
@@ -69,7 +75,7 @@ def build_app(port: int, *, name: str = "Mock Entity Intelligence",
         skills=[AgentSkill(id="entity_research", name="Entity research", description="Resolve institutions and their parents.",
                            tags=["LEI"], examples=["Who is the parent of BlackRock Fund Advisors?"])],
     )
-    handler = DefaultRequestHandler(agent_executor=EntityExecutor(), task_store=InMemoryTaskStore(), agent_card=card)
+    handler = DefaultRequestHandler(agent_executor=EntityExecutor(result_data), task_store=InMemoryTaskStore(), agent_card=card)
     app = Starlette()
     app.routes.extend([*create_agent_card_routes(card), *create_jsonrpc_routes(handler, "/a2a")])
     return app

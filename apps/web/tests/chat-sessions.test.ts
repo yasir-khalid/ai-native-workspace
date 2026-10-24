@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { ChatSessions } from "../lib/chat-sessions";
-import { applyEvent, hydrate } from "../lib/chat-messages";
+import { applyEvent, convert, hydrate } from "../lib/chat-messages";
 import type { RunEvent } from "../lib/types";
 
 const selection = { mode: "auto" as const, agentId: null, caseId: null, callId: "call-a" };
@@ -130,4 +130,31 @@ test("returning after a connection loss adopts the persisted completed answer", 
   sessions.ensure("t1", "t1", []); // late stale response cannot erase it
   assert.equal(sessions.get("t1")!.messages.length, 1);
   sessions.dispose();
+});
+
+
+test("saved result cards and completed activity survive hydration without losing answer text", () => {
+  const result = { kind: "court_availability", version: 1, id: "courts-1", source: "Sportscanner", truncated: false,
+    venues: [{ name: "Example Sports Centre", operator: "Operator", address: "London", date: "Sun, Oct 25",
+      distance_miles: 1.2, stale: true, last_refreshed: "2026-10-24T12:00:00Z",
+      slots: [{ start: "17:00", end: "18:00", price_gbp: 12.8, booking_url: "https://booking.example.com/1" }] }] };
+  const events = [event("run.started", 1), event("agent.selected", 2, { agent_id: "sportscanner", name: "Sportscanner" }),
+    event("tool.started", 3, { tool: "agent.progress", label: "Checking availability" }),
+    event("tool.completed", 4, { tool: "agent.progress", status: "ok", summary: "Checked availability" }),
+    event("ui.result", 5, { result }), event("run.completed", 6)];
+  events[0].timestamp = "2026-10-24T12:00:00Z";
+  events.at(-1)!.timestamp = "2026-10-24T12:00:08Z";
+  const [saved] = hydrate([{ message_id: "m1", role: "assistant", run_id: "r1", created_at: events.at(-1)!.timestamp,
+    content: { text: "Answer with important caveats", agent_id: "sportscanner", activity: events } }]);
+  assert.equal(saved.durationMs, 8000);
+  assert.deepEqual(saved.segments.filter(s => s.kind === "tool").map(s => s.kind === "tool" && s.name),
+    ["podos.route", "agent.progress", "podos.result"]);
+  const rendered = convert(saved);
+  assert.equal(rendered.metadata?.custom?.structuredResults, true);
+  assert.equal(rendered.metadata?.custom?.activityDurationMs, 8000);
+  assert.ok(Array.isArray(rendered.content));
+  assert.equal(rendered.content.at(-1)?.type, "text");
+  assert.equal(rendered.content.filter(s => s.type === "text").map(s => s.type === "text" && s.text).join(""), "Answer with important caveats");
+  // Duplicate protocol snapshots must not duplicate the booking card.
+  assert.equal(applyEvent(saved, event("ui.result", 7, { result })).segments.filter(s => s.kind === "tool" && s.name === "podos.result").length, 1);
 });

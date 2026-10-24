@@ -110,7 +110,7 @@ const baseGroupBy = groupPartByType({
 // PodOS renders some tool calls as first-class results — the routing header, the sources list, file
 // cards and errors. Those stay visible even when the run's progress steps are collapsed, so they are
 // left out of the tool group and rendered standalone; only the thinking/progress steps get grouped.
-const STANDALONE_TOOLS = new Set(["podos.registry", "podos.route", "podos.sources", "podos.artifact", "podos.error"]);
+const STANDALONE_TOOLS = new Set(["podos.registry", "podos.route", "podos.sources", "podos.artifact", "podos.error", "podos.result"]);
 
 const messageGroupBy = (
   part: Parameters<typeof baseGroupBy>[0],
@@ -544,6 +544,15 @@ const MessageError: FC = () => {
   );
 };
 
+const AnswerText: FC = () => {
+  const structured = useAuiState(s => s.message.metadata.custom.structuredResults === true);
+  if (!structured) return <MarkdownText componentsByLanguage={openUIByLanguage} />;
+  return <details className="my-3 text-sm">
+    <summary className="cursor-pointer text-xs font-medium text-muted-foreground">Full response and caveats</summary>
+    <div className="pt-3"><MarkdownText componentsByLanguage={openUIByLanguage} /></div>
+  </details>;
+};
+
 const AssistantMessage: FC = () => {
   const {
     ToolFallback: ToolFallbackComponent = ToolFallback,
@@ -609,7 +618,7 @@ const AssistantMessage: FC = () => {
                 );
               }
               case "text":
-                return <MarkdownText componentsByLanguage={openUIByLanguage} />;
+                return <AnswerText />;
               case "reasoning":
                 return <Reasoning {...part} />;
               case "tool-call":
