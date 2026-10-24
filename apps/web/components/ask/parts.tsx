@@ -65,10 +65,10 @@ function Activity({ name, args, result, isError }: { name: string; args: Record<
   return (
     <div
       role="status"
-      className={cn("flex items-center gap-2 py-1 text-[13px]", isError ? "text-red-900" : warning ? "text-amber-900" : "text-muted-foreground")}
+      className={cn("flex items-start gap-2 py-1 text-sm font-medium leading-6", isError ? "text-red-900" : warning ? "text-amber-900" : "text-foreground")}
     >
-      <Icon className={cn("size-3.5 shrink-0", tone)} />
-      <span className={cn("min-w-0 whitespace-normal", pending && "shimmer")}>{text}</span>
+      <Icon className={cn("mt-1 size-4 shrink-0", tone)} />
+      <span className="min-w-0 whitespace-normal">{text}</span>
     </div>
   );
 }
@@ -189,11 +189,11 @@ export function ActivityGroup({ group, children }: PropsWithChildren<{ group: Th
         setOpen(next);
       }}
     >
-      <CollapsibleTrigger className="flex items-center gap-1.5 py-1 text-[13px] text-muted-foreground transition-colors hover:text-foreground">
+      <CollapsibleTrigger className="flex items-center gap-2 py-1 text-sm font-medium text-foreground transition-colors hover:text-foreground/80">
         <ChevronDownIcon className={cn("size-3.5 shrink-0 transition-transform duration-200 motion-reduce:transition-none", !open && "-rotate-90")} />
         <span>{label}</span>
         {!running && steps > 0 && (
-          <span className="text-subtle">
+          <span className="font-normal text-muted-foreground">
             · {steps} step{steps === 1 ? "" : "s"}
           </span>
         )}

@@ -110,7 +110,8 @@ Sportscanner's named `court_availability` A2A artifact is normalized into a boun
 with venue, address, distance, date, times, GBP prices, freshness and explicit
 provider booking links. Values come from the artifact without a second model pass.
 Malformed results fall back to the ordinary answer; links must be public HTTPS.
-The original answer remains available under **Full response and caveats**.
+The original explanation remains available under **More details**. Freshness and
+provider booking warnings stay visible on each card.
 
 The design follows [OpenUI's component library approach](https://www.openui.com/docs/openui-lang/defining-components)
 and [CopilotKit's controlled generative UI pattern](https://www.copilotkit.ai/generative-ui).
@@ -121,7 +122,9 @@ GBP numbers and explicit formatted amounts such as `£12.80` are normalized with
 parsing explanatory prose. A venue-level fallback is labeled **From**; missing
 amounts remain **Price on provider site**.
 
-**Activity** stays collapsed after completion and can be expanded. It shows the
+**Activity** stays collapsed after completion and can be expanded. Progress uses
+solid, medium-weight text rather than a fading shimmer; a pending tool suppresses
+the redundant generic indicator. Between tools, **Preparing answer…** remains visible. It shows the
 agent's visible tool actions and reported progress, with elapsed time when known;
 it does not expose private model reasoning. Saved answers reconstruct these parts
 from their pod-scoped durable run events, including older chats. Structured cards

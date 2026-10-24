@@ -190,8 +190,12 @@ without an entitlement remain excluded, and server checks still govern every run
 Court availability renders through the existing OpenUI library as controlled
 shadcn cards. Dates/times, GBP prices, address/distance, freshness and **View booking**
 links are readable independently of the original prose. Long result sets and extra
-slots expand explicitly. Original wording and caveats remain in a disclosure.
+slots expand explicitly. Original wording remains under **More details**; freshness
+and provider booking warnings are always visible on cards.
 The UI uses source data, not another model's interpretation of prices or slots.
+
+Working steps use solid 14px medium-weight text, with animation confined to the
+spinner. Pending tools suppress the redundant generic thinking line.
 
 Completed answers keep an expandable **Activity** group. Saved chats restore the
 same public tool steps and duration from durable events. Agent labels remain visible

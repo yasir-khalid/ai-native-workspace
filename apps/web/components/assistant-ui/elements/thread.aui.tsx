@@ -548,9 +548,22 @@ const AnswerText: FC = () => {
   const structured = useAuiState(s => s.message.metadata.custom.structuredResults === true);
   if (!structured) return <MarkdownText componentsByLanguage={openUIByLanguage} />;
   return <details className="my-3 text-sm">
-    <summary className="cursor-pointer text-xs font-medium text-muted-foreground">Full response and caveats</summary>
+    <summary className="w-fit cursor-pointer rounded-sm text-sm font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-4">More details</summary>
     <div className="pt-3"><MarkdownText componentsByLanguage={openUIByLanguage} /></div>
   </details>;
+};
+
+const WorkingIndicator: FC = () => {
+  const pendingTool = useAuiState(s => s.message.content.some(part =>
+    part.type === "tool-call" && !part.toolName.startsWith("podos.") && part.result === undefined,
+  ));
+  // The active tool already supplies a labelled spinner. Avoid a second status
+  // below it; retain a readable fallback before tools start or between steps.
+  if (pendingTool) return null;
+  return <span data-slot="aui_assistant-message-indicator" role="status"
+    className="text-sm font-medium text-foreground" aria-label="Assistant is working">
+    Preparing answer…
+  </span>;
 };
 
 const AssistantMessage: FC = () => {
@@ -638,15 +651,7 @@ const AssistantMessage: FC = () => {
                   </div>
                 );
               case "indicator":
-                return (
-                  <span
-                    data-slot="aui_assistant-message-indicator"
-                    className="shimmer text-sm text-muted-foreground"
-                    aria-label="Assistant is working"
-                  >
-                    Thinking
-                  </span>
-                );
+                return <WorkingIndicator />;
               default:
                 return null;
             }
