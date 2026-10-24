@@ -26,7 +26,10 @@ export default function AskPageClient() {
     }
     // Any other navigation means the thread we replaced into is no longer the live view.
     ownReplace.current = null;
-    setView((prev) => (prev.target === target ? prev : { key: target, threadId, draftId: draft, target }));
+    // A draft promoted to a saved thread deliberately keeps its mounted key.
+    // Navigating back to "new" must use a different key, even if that was the
+    // original key, so its runtime and composer cannot retain the old chat.
+    setView((prev) => (prev.target === target ? prev : { key: crypto.randomUUID(), threadId, draftId: draft, target }));
   }, [threadId, target, draft]);
 
   return (
@@ -36,7 +39,8 @@ export default function AskPageClient() {
       draftId={view.draftId}
       onCreated={(id) => {
         // A request may be accepted after this page has been left or hidden by the router.
-        if (window.location.pathname !== `/${pod}/ask`) return;
+        if (window.location.pathname !== `/${pod}/ask` ||
+          new URLSearchParams(window.location.search).get("draft") !== view.draftId) return;
         ownReplace.current = id;
         setView((v) => ({ ...v, target: id }));
         router.replace(`/${pod}/ask/${id}`);

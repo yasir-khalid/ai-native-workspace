@@ -58,7 +58,8 @@ export function CommandMenuProvider({ children }: { children: ReactNode }) {
         e.preventDefault();
         setOpen(true);
       } else if (k === "n") {
-        router.push(`/${pod}/ask`);
+        e.preventDefault();
+        router.push(prepareAsk(pod, {}));
       } else if (k === "g") {
         pendingG = Date.now();
       } else if (GO[k] && Date.now() - pendingG < 1200) {
@@ -99,7 +100,7 @@ function Menu({ close }: { close: () => void }) {
         <CommandEmpty>No results.</CommandEmpty>
         <CommandGroup heading="Go to">
           {PAGES.map((p) => (
-            <CommandItem key={p.href} value={`page ${p.label}`} onSelect={() => go(`/${pod}/${p.href}`)}>
+            <CommandItem key={p.href} value={`page ${p.label}`} onSelect={() => go(p.href === "ask" ? prepareAsk(pod, {}) : `/${pod}/${p.href}`)}>
               <p.icon /> {p.label}
               <CommandShortcut>{p.keys}</CommandShortcut>
             </CommandItem>

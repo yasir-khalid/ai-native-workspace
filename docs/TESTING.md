@@ -141,7 +141,10 @@ Calls and Inbox, with Monitors/Activity inside Inbox. Critical flows include:
 
 1. Select a call through `@`, use arrow keys/Enter, remove it and send a follow-up.
 2. Open different calls with **Ask this call**; unsent drafts must not retain the
-   previous company. A normal New chat must start empty.
+   previous company. A normal New chat must start empty, including repeated clicks after a draft
+   becomes a saved thread. Sidebar, Today, command search and the N shortcut must
+   clear unsent text, selected agent and call/case context. A delayed acceptance
+   from the old chat must not redirect the new draft.
 3. Start an answer, navigate to Calls/Today, and observe its chat-list spinner.
 4. Run a second chat concurrently; reopen and reload an active answer without a
    duplicate question or cancellation. Stop only through the explicit control.
@@ -200,3 +203,17 @@ sums counts before division. Normalization policy, corpus, source hashes and
 review status must accompany a score. A third-party transcript comparison is not
 human-gold acoustic accuracy. See [Calls](CALLS.md) for the actual references and
 [the measured experiments](CALLS_ACCURACY_RESEARCH.md) for results.
+
+
+The focused navigation regression uses browser-intercepted conversation responses
+against a running demo. It creates no real model runs and verifies fresh drafts,
+continued background answers, separate threads, all New chat entry points, delayed
+acceptance and mobile navigation:
+
+```sh
+node scripts/e2e_new_chat.mjs
+```
+
+It requires Playwright/Chromium as above. If Playwright is installed in another
+workspace, set `PODOS_PLAYWRIGHT_MODULE` to that installation's absolute
+`playwright/index.mjs` path. Evidence is written under ignored `var/new-chat-qa/`.

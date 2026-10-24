@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { NewChatLink } from "@/components/new-chat-link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { SWRConfig } from "swr";
@@ -135,6 +136,7 @@ function Chats() {
 
 function Nav() {
   const { pod } = usePod();
+  const { setOpenMobile } = useSidebar();
   const pathname = usePathname();
   const { data: summary } = usePodData<{ unread: number; actionable: number }>(`/v1/pods/${pod}/inbox/summary`, {
     refreshInterval: 5000,
@@ -147,7 +149,7 @@ function Nav() {
         <SidebarMenuItem>
           <SidebarMenuButton
             tooltip="New chat"
-            render={<Link href={`/${pod}/ask`} />}
+            render={<NewChatLink pod={pod} onClick={() => setOpenMobile(false)} />}
             className="mb-2 h-7 rounded-md bg-sidebar-accent px-2 text-[13px] font-medium text-gray-1000 hover:bg-sidebar-accent hover:text-gray-1000 [&_svg]:size-[15px] group-data-[collapsible=icon]:bg-transparent"
           >
             <SquarePenIcon />

@@ -3,6 +3,7 @@
 import { prepareAsk } from "@/lib/ask-handoff";
 
 import Link from "next/link";
+import { NewChatLink } from "@/components/new-chat-link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -73,7 +74,7 @@ export default function TodayPage() {
               <Button size="sm" variant="outline" className="h-8 rounded-md" onClick={() => void mutate()} disabled={isValidating}>
                 <RefreshCwIcon className={isValidating ? "animate-spin motion-reduce:animate-none" : ""} /> Refresh
               </Button>
-              <Button size="sm" className="h-8 rounded-md" nativeButton={false} render={<Link href={`/${pod}/ask`} />}>
+              <Button size="sm" className="h-8 rounded-md" nativeButton={false} render={<NewChatLink pod={pod} />}>
                 <SquarePenIcon /> New chat
               </Button>
             </div>
@@ -101,7 +102,7 @@ export default function TodayPage() {
         <Empty title="You're all caught up" icon={<SunIcon className="size-5 text-amber-900" />}>
           <span>Nothing new since yesterday. Your monitors are watching and will bring anything important here.</span>
           <div className="mt-4">
-            <Button size="sm" className="h-8 rounded-md" nativeButton={false} render={<Link href={`/${pod}/ask`} />}>
+            <Button size="sm" className="h-8 rounded-md" nativeButton={false} render={<NewChatLink pod={pod} />}>
               <SquarePenIcon /> Start a new chat
             </Button>
           </div>
