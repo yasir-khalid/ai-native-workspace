@@ -69,8 +69,9 @@ Today["Today: inspect what changed"]:::interface --> Chat["Chat: question and so
 ```
 ## 1. Enter a pod
 
-Sign in as Alice for Alpha or Dana to switch between Alpha and Beta. The visible
-navigation is New chat, Today, Research, Calls and Inbox. Open the command menu
+Sign in as Yasir Khalid for Alpha or Bianca Rossi for Beta. These are the only
+two demo accounts; neither is a platform administrator. The visible navigation
+is New chat, Today, Research, Calls and Inbox. Open the command menu
 with Cmd/Ctrl+K to find chats, research cases and available agents.
 
 ## 2. Inspect research and ask
@@ -115,8 +116,8 @@ again. The explicit Stop control cancels; navigation does not.
 
 ## 6. Show exports and approvals
 
-Alice/Arjun can request a small research deck when their capability grant permits
-it. Ben's Beta role lacks the PowerPoint entitlement. In Inbox, use the Monitors
+Both users can request a small research deck from their own pod. Yasir also has
+exclusive access to Sportscanner through the agent picker. In Inbox, use the Monitors
 tab for a seeded monitor and Activity for run history. Review an approval's source
 and draft, then approve/reject using its versioned decision controls. The worker
 creates the ready artifact and generic email preview; Mailpit is at
@@ -124,16 +125,19 @@ creates the ready artifact and generic email preview; Mailpit is at
 
 ## 7. Verify pod separation
 
-As Dana, switch Alpha/Beta. Research, chats, inbox and available agents must reflect
-the selected pod. As Pat, use the admin API to review control-plane state without
-pod research access. There is currently no standalone Admin or Agents web page.
+Sign out of Yasir and sign in as Bianca. Research, chats and inbox must now show
+Beta material. Neither account can open the other pod by changing the URL.
+Sportscanner appears for Yasir only. Both users can browse earnings calls and ask
+grounded questions within their own pod. Administration is handled separately
+from this research demo; no platform-admin account appears in the login menu.
 
 ## Optional API demonstrations
 
-Use the live [OpenAPI schema](http://localhost:8400/docs) and an authorized admin
+Outside the two-account research demo, use the live
+[OpenAPI schema](http://localhost:8400/docs) and a separately provisioned admin
 identity for registry publication, release preview, canary, emergency disable or
 access changes. These are real API capabilities; screenshots of the old console
 are historical. T1/T5/T7/T11 suites provide repeatable checks of their boundaries.
 
-The legacy `make e2e` walkthrough needs migration to this navigation before it can
-be used as the current browser acceptance gate. See [Testing](TESTING.md).
+The legacy `make e2e` walkthrough needs migration to the two-account login and
+current navigation before it can be used as the browser acceptance gate. See [Testing](TESTING.md).

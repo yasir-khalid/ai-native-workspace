@@ -95,21 +95,25 @@ Open [the workspace](http://localhost:3400), select an identity, and choose a po
 Without a model key, agents use the deterministic implementation. This is suitable
 for the core isolation demo and acceptance tests.
 
-## Development identities
+## Demo accounts
 
-| Identity | Pod access | Useful scenario |
+The workspace offers exactly two accounts, each with its own research reports,
+chats, inbox and earnings-call access:
+
+| Identity | Pod access | Available features |
 |---|---|---|
-| Yasir Khalid | Alpha, PM | Main external demo; research, exports, approvals and exclusive Sportscanner access |
-| Alice Chen | Alpha, PM | Research, exports and approvals |
-| Arjun Patel | Alpha, analyst | Analyst workflow and exports |
-| Bianca Rossi | Beta, PM | Beta decisions |
-| Ben Okafor | Beta, analyst | Research without PowerPoint entitlement |
-| Dana Kim | Alpha and Beta | Pod switching and cache separation |
-| Pat Morgan | Platform administration; no pod membership | Admin API; no research access |
+| Yasir Khalid | Alpha, portfolio manager | Alpha research, earnings calls, exports, approvals and Sportscanner |
+| Bianca Rossi | Beta, portfolio manager | Beta research, earnings calls, exports and approvals; no Sportscanner |
 
-For an external presentation, use Yasir as the main account, Bianca to demonstrate
-pod isolation, and Pat for platform administration. The other accounts remain
-available as permission and workflow test fixtures.
+Neither account is a platform administrator. Administration stays outside the
+research demo and requires a separately provisioned administrator through the
+control-plane API. No administrative demo login is provided.
+
+Switch accounts to demonstrate separation: neither user can access the other's
+pod, reports or conversations. The public call recordings may be the same in
+both libraries; their saved chats and research context remain pod-scoped.
+Retired demo users are disabled during dev/test seeding, invalidating their
+sessions without deleting historical records.
 
 Sportscanner is connected as an external A2A agent at `http://127.0.0.1:8001`.
 Only `yasir.khalid` has its pod-scoped grant in `config/access-template.json`;

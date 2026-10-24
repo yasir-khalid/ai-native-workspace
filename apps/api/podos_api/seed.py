@@ -71,6 +71,37 @@ async def upsert_release(conn, rel: ReleasePolicy, updated_by: str) -> None:
     )
 
 
+async def sync_directory(db: Database, iam: dict[str, Any], *, deactivate_missing: bool = False) -> None:
+    """Apply the configured directory; dev/test can retire accounts without deleting history."""
+    async with db.system_tx() as conn:
+        if deactivate_missing:
+            await conn.execute(
+                "UPDATE users SET active = false, platform_roles = '{}' WHERE NOT (subject_id = ANY(%s))",
+                ([u["subject_id"] for u in iam["users"]],),
+            )
+            await conn.execute("UPDATE pod_memberships SET revoked_at = now() WHERE revoked_at IS NULL")
+        for p in iam["pods"]:
+            await conn.execute(
+                """INSERT INTO pods(pod_id, display_name, strategy, accent) VALUES (%s,%s,%s,%s)
+                   ON CONFLICT (pod_id) DO UPDATE SET display_name = excluded.display_name""",
+                (p["pod_id"], p["display_name"], p["strategy"], p["accent"]),
+            )
+        for u in iam["users"]:
+            await conn.execute(
+                """INSERT INTO users(subject_id, display_name, email, title, platform_roles) VALUES (%s,%s,%s,%s,%s)
+                   ON CONFLICT (subject_id) DO UPDATE SET display_name = excluded.display_name,
+                     email = excluded.email, title = excluded.title, platform_roles = excluded.platform_roles, active = true""",
+                (u["subject_id"], u["display_name"], u["email"], u["title"], u["platform_roles"]),
+            )
+            for m in u["memberships"]:
+                await conn.execute(
+                    """INSERT INTO pod_memberships(pod_id, subject_id, pod_role, groups) VALUES (%s,%s,%s,%s)
+                       ON CONFLICT (pod_id, subject_id) DO UPDATE SET pod_role = excluded.pod_role,
+                         groups = excluded.groups, revoked_at = NULL""",
+                    (m["pod_id"], u["subject_id"], m["pod_role"], m["groups"]),
+                )
+
+
 async def seed(settings: Settings | None = None) -> dict[str, int]:
     s = settings or get_settings()
     cfg: Path = s.config_dir
@@ -79,29 +110,9 @@ async def seed(settings: Settings | None = None) -> dict[str, int]:
     counts = {"pods": 0, "users": 0, "agents": 0, "documents": 0, "monitors": 0}
     try:
         iam = json.loads((cfg / "iam.json").read_text())
+        await sync_directory(db, iam, deactivate_missing=s.env in {"dev", "test"})
+        counts.update(pods=len(iam["pods"]), users=len(iam["users"]))
         async with db.system_tx() as conn:
-            for p in iam["pods"]:
-                await conn.execute(
-                    """INSERT INTO pods(pod_id, display_name, strategy, accent) VALUES (%s,%s,%s,%s)
-                       ON CONFLICT (pod_id) DO UPDATE SET display_name = excluded.display_name""",
-                    (p["pod_id"], p["display_name"], p["strategy"], p["accent"]),
-                )
-                counts["pods"] += 1
-            for u in iam["users"]:
-                await conn.execute(
-                    """INSERT INTO users(subject_id, display_name, email, title, platform_roles) VALUES (%s,%s,%s,%s,%s)
-                       ON CONFLICT (subject_id) DO UPDATE SET platform_roles = excluded.platform_roles""",
-                    (u["subject_id"], u["display_name"], u["email"], u["title"], u["platform_roles"]),
-                )
-                for m in u["memberships"]:
-                    await conn.execute(
-                        """INSERT INTO pod_memberships(pod_id, subject_id, pod_role, groups) VALUES (%s,%s,%s,%s)
-                           ON CONFLICT (pod_id, subject_id) DO UPDATE SET pod_role = excluded.pod_role,
-                             groups = excluded.groups, revoked_at = NULL""",
-                        (m["pod_id"], u["subject_id"], m["pod_role"], m["groups"]),
-                    )
-                counts["users"] += 1
-
             for path in sorted((cfg / "manifests" / "capabilities").glob("*.json")):
                 cm = validate_capability_manifest(json.loads(path.read_text()))
                 await conn.execute(

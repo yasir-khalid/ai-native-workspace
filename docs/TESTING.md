@@ -5,7 +5,9 @@
 Run from the application root. The acceptance harness starts real HTTP API/A2A/MCP
 servers and uses the Docker data plane. It reseeds **`podos_test`** between tests,
 with test search indexes, a test artifact bucket and a separate OpenFGA store.
-Never replace those settings with a production connection string.
+Never replace those settings with a production connection string. Authorization
+scenarios use a separate directory under `tests/fixtures/` in that test database;
+those identities are never seeded into the two-account external demo.
 
 ```mermaid
 ---

@@ -20,6 +20,11 @@ import uvicorn
 
 ROOT = Path(__file__).resolve().parents[1]
 TMP = Path(tempfile.mkdtemp(prefix="podos-test-"))
+# Broader authorization scenarios live only in the isolated test database, never in demo IAM.
+TEST_CONFIG = TMP / "config"
+shutil.copytree(ROOT / "config", TEST_CONFIG, ignore=shutil.ignore_patterns("data_plane.dev.json"))
+shutil.copyfile(ROOT / "tests/fixtures/authorization-directory.json", TEST_CONFIG / "iam.json")
+shutil.copyfile(ROOT / "tests/fixtures/authorization-research.json", TEST_CONFIG / "seed/research.json")
 
 
 def _free_port() -> int:
@@ -54,6 +59,7 @@ ENDPOINTS.write_text(json.dumps({k: f"http://127.0.0.1:{p}" for k, p in PORTS.it
 
 os.environ.update({
     "PODOS_ENV": "test",
+    "PODOS_CONFIG_DIR": str(TEST_CONFIG),
     "PODOS_DATABASE_URL": "postgresql://podos_app:podos_app@127.0.0.1:55432/podos_test",
     "PODOS_OWNER_DATABASE_URL": "postgresql://podos_owner:podos_owner@127.0.0.1:55432/podos_test",
     "PODOS_POLICY_PATH": str(POLICY),
