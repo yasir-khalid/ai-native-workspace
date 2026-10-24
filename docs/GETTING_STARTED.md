@@ -99,12 +99,27 @@ for the core isolation demo and acceptance tests.
 
 | Identity | Pod access | Useful scenario |
 |---|---|---|
+| Yasir Khalid | Alpha, PM | Main external demo; research, exports, approvals and exclusive Sportscanner access |
 | Alice Chen | Alpha, PM | Research, exports and approvals |
 | Arjun Patel | Alpha, analyst | Analyst workflow and exports |
 | Bianca Rossi | Beta, PM | Beta decisions |
 | Ben Okafor | Beta, analyst | Research without PowerPoint entitlement |
 | Dana Kim | Alpha and Beta | Pod switching and cache separation |
 | Pat Morgan | Platform administration; no pod membership | Admin API; no research access |
+
+For an external presentation, use Yasir as the main account, Bianca to demonstrate
+pod isolation, and Pat for platform administration. The other accounts remain
+available as permission and workflow test fixtures.
+
+Sportscanner is connected as an external A2A agent at `http://127.0.0.1:8001`.
+Only `yasir.khalid` has its pod-scoped grant in `config/access-template.json`;
+other users cannot discover or invoke it, including by sending its ID directly.
+Select Sportscanner in the Ask composer and try “Badminton near E1 2AD tomorrow
+evening.” The separate Sportscanner service must be running. This local endpoint
+currently has authentication disabled for development; shared deployments need
+a Sportscanner bearer credential configured through an agent secret reference.
+PodOS sends the question and a conversation key, without its session token,
+pod research or permission metadata.
 
 These accounts come from the development identity directory. The login picker is
 disabled outside `dev`/`test`; this is not an enterprise SSO implementation.

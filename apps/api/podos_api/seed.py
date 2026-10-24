@@ -159,7 +159,7 @@ async def seed(settings: Settings | None = None) -> dict[str, int]:
                         (am.agent_id, am.implementation_version, e["url"]),
                     )
                     await upsert_release(conn, validate_release({
-                        "schema_version": "1.0", "revision": "dev.1", "release_key": f"{am.agent_id}-pilot", "kind": "agent",
+                        "schema_version": "1.0", "revision": "dev.1", "release_key": e.get("release_key", f"{am.agent_id}-pilot"), "kind": "agent",
                         "agent_id": am.agent_id, "agent_version": am.implementation_version, "stage": e["stage"], "published": True,
                         "pod_allowlist": e["pods"], "eligible_groups": ["research_users"],
                         "feature_flags": {"catalogue_visible": True, "direct_invoke": True, "auto_route": e["stage"] == "POD_PILOT_AUTO",

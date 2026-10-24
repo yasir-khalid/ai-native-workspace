@@ -5,6 +5,7 @@
     {"pod_id": "pod_beta", "display_name": "Beta Partners", "strategy": "Healthcare event-driven", "accent": "emerald"}
   ],
   "users": [
+    {"subject_id": "yasir.khalid", "display_name": "Yasir Khalid", "email": "yasir.khalid@fund.example", "title": "Portfolio Manager", "platform_roles": [], "memberships": [{"pod_id": "pod_alpha", "pod_role": "pm", "groups": ["research_users", "deck_builders", "approvers"]}]},
     {"subject_id": "alice.chen", "display_name": "Alice Chen", "email": "alice.chen@fund.example", "title": "Portfolio Manager", "platform_roles": [],
      "memberships": [{"pod_id": "pod_alpha", "pod_role": "pm", "groups": ["research_users", "deck_builders", "approvers"]}]},
     {"subject_id": "arjun.patel", "display_name": "Arjun Patel", "email": "arjun.patel@fund.example", "title": "Senior Analyst", "platform_roles": [],

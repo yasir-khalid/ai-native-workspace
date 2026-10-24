@@ -107,6 +107,13 @@ def template_tuples(template: dict, pod_ids: list[str]) -> list[Tuple]:
                 out.append(action_tuple(act, pod_id, ref))
         for f in template.get("pod_wide_features", []):
             out += grant_tuples("feature", pod_id, f, subject_ref("pod", pod_id, ""))
+    # Person-specific grants stay pod-scoped and still require live pod membership.
+    for grant in template.get("user_grants", []):
+        if grant["pod_id"] not in pod_ids:
+            raise ValueError(f"unknown pod in user grant: {grant['pod_id']}")
+        for kind in GRANT_KINDS:
+            for item_id in grant.get("capabilities" if kind == "capability" else f"{kind}s", []):
+                out += grant_tuples(kind, grant["pod_id"], item_id, user(grant["subject_id"]))
     for wid, caps in {**template.get("agent_service_grants", {}), **template.get("workflow_service_grants", {})}.items():
         out += [service_grant_tuple(wid, c) for c in caps]
     return out

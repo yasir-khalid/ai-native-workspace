@@ -61,5 +61,14 @@
       "document.export.pptx",
       "document.export.docx"
     ]
-  }
+  },
+  "user_grants": [
+    {
+      "pod_id": "pod_alpha",
+      "subject_id": "yasir.khalid",
+      "agents": [
+        "sportscanner"
+      ]
+    }
+  ]
 }

@@ -8,8 +8,24 @@
       "owner_team": "Institutional Entity Intelligence",
       "version": "0.1.0",
       "url": "http://127.0.0.1:8000",
-      "pods": ["pod_alpha", "pod_beta"],
+      "pods": [
+        "pod_alpha",
+        "pod_beta"
+      ],
       "stage": "POD_PILOT_AUTO"
+    },
+    {
+      "agent_id": "sportscanner",
+      "name": "Sportscanner Court Finder",
+      "description": "Finds publicly bookable London sports courts by sport, location, date and time, with prices and booking links. Available only to Yasir Khalid; it never books or pays.",
+      "owner_team": "Sportscanner",
+      "version": "1.0.0",
+      "url": "http://127.0.0.1:8001",
+      "pods": [
+        "pod_alpha"
+      ],
+      "stage": "POD_PILOT_DIRECT",
+      "release_key": "sportscanner-release"
     }
   ]
 }

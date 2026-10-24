@@ -9,7 +9,7 @@ verification). This suite drives the whole path against a real a2a-sdk agent (te
 from __future__ import annotations
 
 import pytest
-from conftest import _free_port, _Server, last, text_of
+from conftest import _free_port, _Server, last, login, text_of
 
 EXT_PORT = _free_port()
 
@@ -98,3 +98,54 @@ async def test_external_stream_maps_progress_answer_citations_and_verification(p
     assert cites[0]["title"].startswith("LEI "), "evidence criteria become a friendly citation title"
     assert cites[0]["url"].startswith("https://"), "a source URI is kept only when it is https"
     assert cites[0]["doc_id"] is None
+
+
+async def test_sportscanner_is_visible_and_invocable_only_by_yasir(pat, external_agent):
+    """A person-specific seed grant protects both catalogue and direct API dispatch."""
+    r = await pat.post("/v1/admin/agents/connect", json={
+        "url": f"http://127.0.0.1:{EXT_PORT}", "agent_id": "sportscanner",
+        "owner_team": "Sportscanner", "change_ticket": "CHG-SPORT-1"})
+    assert r.status_code == 201, r.text
+    reg = r.json()
+    r = await pat.patch("/v1/admin/agents/sportscanner/status",
+                        json={"publication_status": "pilot", "change_ticket": "CHG-SPORT-2"})
+    assert r.status_code == 200, r.text
+    await admin_patch(pat, reg["release_key"], stage="POD_PILOT_DIRECT", published=True,
+                      pod_allowlist=["pod_alpha"], eligible_groups=["research_users"],
+                      feature_flags={"catalogue_visible": True, "direct_invoke": True, "auto_route": False})
+
+    yasir = await login("yasir.khalid")
+    try:
+        me = (await yasir.get("/v1/me")).json()
+        assert me["display_name"] == "Yasir Khalid"
+        pods = (await yasir.get("/v1/me/pods")).json()
+        assert [(p["pod_id"], p["pod_role"]) for p in pods] == [("pod_alpha", "pm")]
+        agents = (await yasir.get("/v1/pods/pod_alpha/agents")).json()
+        sport = next(a for a in agents if a["agent_id"] == "sportscanner")
+        assert sport["external"] and sport["actions"]["direct"]
+        assert not sport["actions"]["auto"] and not sport["actions"]["background"]
+        external_agent.RECEIVED.clear()
+        _, events = await yasir.ask("pod_alpha", "Find badminton courts near E1 2AD", agent_id="sportscanner")
+        assert last(events)["type"] == "run.completed"
+        assert external_agent.RECEIVED[0]["text"] == "Find badminton courts near E1 2AD"
+        assert not external_agent.RECEIVED[0]["metadata"]
+        assert not external_agent.RECEIVED[0]["request_metadata"]
+    finally:
+        await yasir.http.aclose()
+
+    for subject, pod in [("alice.chen", "pod_alpha"), ("arjun.patel", "pod_alpha"),
+                         ("dana.kim", "pod_alpha"), ("bianca.rossi", "pod_beta"),
+                         ("ben.okafor", "pod_beta"), ("dana.kim", "pod_beta")]:
+        other = await login(subject)
+        try:
+            catalogue = await other.get(f"/v1/pods/{pod}/agents")
+            assert catalogue.status_code == 200
+            assert "sportscanner" not in {a["agent_id"] for a in catalogue.json()}
+            thread = await other.new_thread(pod)
+            denied = await other.post(f"/v1/threads/{thread}/runs", pod=pod,
+                                      json={"mode": "direct", "agent_id": "sportscanner", "message": "Find courts"})
+            assert denied.status_code == 403, (subject, denied.text)
+        finally:
+            await other.http.aclose()
+    # Administration does not confer research access.
+    assert (await pat.get("/v1/pods/pod_alpha/agents")).status_code == 403
