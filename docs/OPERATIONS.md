@@ -34,8 +34,13 @@ not resolve it.
 
 External services run independently of `make dev`. Check the registered Agent Card
 URL and the pod agent catalogue before changing permissions. An entitled agent with
-`unavailable_reason: agent_unhealthy` has a connection problem. The chat picker keeps
-that agent visible as **Offline**, disables selection and refreshes every 15 seconds.
+`unavailable_reason: agent_unhealthy` has a connection problem. The catalogue exposes
+`health_status` as `healthy`, `unhealthy` or `not_connected`. Chat and command search
+always list all entitled agents, including routers and background agents, with a
+health badge. Unavailable chat actions are greyed out with an explanation; paused,
+unpublished and emergency-disabled entries stay visible too. Both menus refresh
+every 15 seconds. An access grant is still required to discover an agent, and all
+release/health gates remain enforced at dispatch.
 The worker checks external health every 30 seconds; recovery can take one check plus
 one browser refresh interval. Auto routing continues to exclude unhealthy agents.
 

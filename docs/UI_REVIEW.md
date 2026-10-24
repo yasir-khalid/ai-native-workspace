@@ -176,10 +176,16 @@ Agents/Admin web screens and their screenshot affordances are historical.
 
 ## External A2A agent in the UI
 
-An entitled specialist whose service is unhealthy stays in the agent picker as a
-disabled **Offline** row. A temporary connection failure must not imply that access
-or the integration was removed. The catalogue refreshes periodically so selection
-returns when the service recovers; server authorization still decides invocation.
+The chat picker and command search show every registered agent the active user is
+entitled to, including Auto and background agents. Each row has a **Healthy**,
+**Unhealthy** or **Not connected** badge. Unavailable chat controls are greyed out,
+with an explanation for paused releases, disabled direct chat or service failures.
+Background agents remain visible with a **Background** label and a Monitors hint.
+
+Publication, release cohorts and emergency disable affect invocation, not discovery
+of an existing entitlement. Both menus refresh every 15 seconds; recovery restores
+selection without reloading. Row order stays stable across health changes. Agents
+without an entitlement remain excluded, and server checks still govern every run.
 
 Court availability renders through the existing OpenUI library as controlled
 shadcn cards. Dates/times, GBP prices, address/distance, freshness and **View booking**

@@ -9,7 +9,9 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AgentTile, agentDescription } from "@/components/common";
+import { AgentTile } from "@/components/common";
+import { AgentMenuDetails } from "@/components/agent-menu-details";
+import { canChatWithAgent, orderedAgents } from "@/lib/agent-availability";
 import { Button } from "@/components/ui/button";
 import { usePod } from "@/components/shell/session";
 import { usePodData } from "@/components/shell/hooks";
@@ -40,28 +42,18 @@ function Footnote() {
   );
 }
 
-function AgentRow({ agentId, active, title, desc, badge, disabled, onClick }: { agentId: string; active: boolean; title: string; desc: string; badge?: string; disabled?: boolean; onClick: () => void }) {
+function AgentRow({ agent, active, onClick }: { agent: CatalogueAgent; active: boolean; onClick: () => void }) {
   return (
-    <DropdownMenuItem disabled={disabled} onClick={onClick} className="items-start gap-3 rounded-md px-2.5 py-2">
-      <AgentTile agentId={agentId} size="sm" />
-      <div className="grid min-w-0 flex-1 gap-0.5">
-        <span className="flex items-center gap-2 text-sm">
-          {title}
-          {badge && <span className="rounded-full bg-amber-200 px-1.5 text-[10px] font-medium text-amber-900">{badge}</span>}
-        </span>
-        <span className="line-clamp-2 text-xs text-muted-foreground">{desc}</span>
-      </div>
-      <CheckIcon className={cn("mt-0.5 size-4", !active && "invisible")} />
+    <DropdownMenuItem disabled={!canChatWithAgent(agent)} onClick={onClick} className="items-start gap-3 rounded-md px-2.5 py-2.5 data-disabled:opacity-100">
+      <AgentMenuDetails agent={agent} />
+      {active && <CheckIcon className="mt-0.5 size-4" aria-label="Selected" />}
     </DropdownMenuItem>
   );
 }
 
 function AgentSwitcher({ agents, sel, setSel }: { agents: CatalogueAgent[]; sel: AskSelection; setSel: (s: AskSelection) => void }) {
-  // The server already filters this catalogue by entitlement. A temporary outage
-  // disables invocation, but should not make a connected agent disappear.
-  const direct = agents.filter((a) => a.kind === "specialist" && (a.actions.direct || a.unavailable_reason === "agent_unhealthy"));
-  const autoAvailable = agents.some((a) => a.agent_id === "auto-router" && a.actions.direct);
-  const current = sel.mode === "auto" ? "Auto" : direct.find((a) => a.agent_id === sel.agentId)?.name ?? "Choose agent";
+  const catalogue = orderedAgents(agents);
+  const current = sel.mode === "auto" ? "Auto" : agents.find((a) => a.agent_id === sel.agentId)?.name ?? "Choose agent";
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -73,29 +65,18 @@ function AgentSwitcher({ agents, sel, setSel }: { agents: CatalogueAgent[]; sel:
           </Button>
         }
       />
-      <DropdownMenuContent className="w-80 p-1.5" align="start">
+      <DropdownMenuContent className="w-96 max-w-[calc(100vw-2rem)] p-1.5" align="start">
         <DropdownMenuGroup>
-          {autoAvailable && (
-            <AgentRow
-              agentId="auto-router"
-              active={sel.mode === "auto"}
-              title="Auto"
-              desc="Picks the best agent available to you for each request"
-              onClick={() => setSel({ ...sel, mode: "auto", agentId: null })}
-            />
-          )}
-          {autoAvailable && direct.length > 0 && <DropdownMenuSeparator />}
-          {direct.map((a) => (
-            <AgentRow
-              key={a.agent_id}
-              agentId={a.agent_id}
-              active={sel.mode === "direct" && sel.agentId === a.agent_id}
-              title={a.name}
-              desc={!a.healthy ? "The connected service is offline. Availability updates automatically." : agentDescription(a.agent_id, a.description)}
-              badge={!a.healthy ? "Offline" : a.release_stage?.startsWith("POD_PILOT") ? "Preview" : undefined}
-              disabled={!a.actions.direct}
-              onClick={() => setSel({ ...sel, mode: "direct", agentId: a.agent_id })}
-            />
+          <DropdownMenuLabel>Your agents · live health</DropdownMenuLabel>
+          {catalogue.map((agent, index) => (
+            <div key={agent.agent_id}>
+              {index > 0 && catalogue[index - 1].kind !== agent.kind && <DropdownMenuSeparator />}
+              <AgentRow
+                agent={agent}
+                active={agent.agent_id === "auto-router" ? sel.mode === "auto" : sel.mode === "direct" && sel.agentId === agent.agent_id}
+                onClick={() => setSel({ ...sel, mode: agent.agent_id === "auto-router" ? "auto" : "direct", agentId: agent.agent_id === "auto-router" ? null : agent.agent_id })}
+              />
+            </div>
           ))}
         </DropdownMenuGroup>
       </DropdownMenuContent>

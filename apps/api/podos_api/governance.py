@@ -224,10 +224,15 @@ class Governance:
         )
 
     def catalogue(self, ctx: PodContext, snap: Snapshot) -> list[AgentAvailability]:
+        """Discover every entitled agent, independently of invocation availability.
+
+        Release/health gates still run in ``allows`` and at dispatch. A paused,
+        disconnected or emergency-disabled agent must not silently disappear.
+        """
         out = []
         for agent_id in sorted(snap.agents):
             av = self.agent_availability(ctx, snap, agent_id)
-            if av and av.catalogue_visible:
+            if av and av.entitled:
                 out.append(av)
         return out
 

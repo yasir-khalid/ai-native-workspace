@@ -19,6 +19,7 @@ export type CatalogueAgent = {
   version: string | null;
   release_stage: string | null;
   healthy: boolean;
+  health_status: "healthy" | "unhealthy" | "not_connected";
   capabilities: string[];
   external: boolean;
   actions: { direct: boolean; auto: boolean; background: boolean };

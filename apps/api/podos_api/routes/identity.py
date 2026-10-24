@@ -87,15 +87,17 @@ async def pod_agents(ctx: PodContext = Depends(pod_ctx_from_path), svc=Depends(s
     for av in svc.gov.catalogue(ctx, snap):
         direct_ok, direct_why = av.allows("direct_invoke")
         auto_ok, _ = av.allows("auto_route")
-        bg_ok, _ = av.allows("background_execution")
+        bg_ok, bg_why = av.allows("background_execution")
+        available, why = (bg_ok, bg_why) if av.kind == "background" else (direct_ok, direct_why)
         out.append({
             "agent_id": av.agent_id, "name": av.name, "description": av.description, "kind": av.kind,
             "owner_team": av.owner_team, "publication_status": av.publication_status, "version": av.version,
             "release_stage": av.release_stage, "healthy": av.healthy, "capabilities": av.capabilities,
+            "health_status": "not_connected" if av.deployment is None else "healthy" if av.healthy else "unhealthy",
             # External A2A agents receive only the user's question (no pod research or identifiers).
             "external": bool(av.deployment and av.deployment.trust == "external"),
             "actions": {"direct": direct_ok, "auto": auto_ok, "background": bg_ok},
-            "unavailable_reason": None if direct_ok or av.kind != "specialist" else direct_why,
+            "unavailable_reason": None if available else why,
         })
     return out
 

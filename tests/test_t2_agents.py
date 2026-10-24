@@ -19,12 +19,13 @@ async def test_catalogue_is_server_filtered(alice, ben):
     alpha = {a["agent_id"]: a for a in (await alice.get("/v1/pods/pod_alpha/agents")).json()}
     beta = {a["agent_id"]: a for a in (await ben.get("/v1/pods/pod_beta/agents")).json()}
     assert {"equity-research", "filing-analyst", "auto-router"} <= set(alpha)
-    assert "filing-analyst" not in beta, "Agent B is piloted with Alpha only"
+    assert beta["filing-analyst"]["actions"]["direct"] is False, "Entitled but outside the Alpha pilot"
+    assert beta["filing-analyst"]["unavailable_reason"] == "release_direct_invoke_disabled"
     assert alpha["filing-analyst"]["actions"] == {"direct": True, "auto": False, "background": False}
     assert alpha["equity-research"]["actions"]["auto"] is True
 
 
-async def test_direct_invoke_of_hidden_agent_denied(ben):
+async def test_direct_invoke_of_unavailable_agent_denied(ben):
     t = await ben.new_thread("pod_beta")
     r = await ben.post(f"/v1/threads/{t}/runs", json={"mode": "direct", "agent_id": "filing-analyst", "message": "HLXT 8-K"},
                        pod="pod_beta")
@@ -154,6 +155,10 @@ async def test_auto_falls_back_within_pod_when_selected_agent_down(alice, pat):
 async def test_unhealthy_deployment_not_invocable(alice, svc):
     async with svc.db.system_tx() as conn:
         await conn.execute("UPDATE agent_deployments SET healthy = false WHERE agent_id = 'equity-research'")
+    catalogue = {a["agent_id"]: a for a in (await alice.get("/v1/pods/pod_alpha/agents")).json()}
+    assert catalogue["equity-research"]["health_status"] == "unhealthy"
+    assert catalogue["equity-research"]["unavailable_reason"] == "agent_unhealthy"
+    assert not any(catalogue["equity-research"]["actions"].values())
     t = await alice.new_thread("pod_alpha")
     r = await alice.post(f"/v1/threads/{t}/runs", json={"mode": "direct", "agent_id": "equity-research", "message": "x"},
                          pod="pod_alpha")
@@ -167,3 +172,21 @@ async def test_tampered_agent_card_rejected(alice, svc):
     assert row["n"] == 1
     _, ev = await alice.ask("pod_alpha", "NWSC thesis")
     assert ev[-1]["type"] == "run.failed" and ev[-1]["code"] == "agent_card_mismatch"
+
+
+async def test_disconnected_router_and_background_stay_visible(alice, svc):
+    async with svc.db.system_tx() as conn:
+        await conn.execute("DELETE FROM agent_deployments WHERE agent_id = 'auto-router'")
+        await conn.execute("UPDATE agent_deployments SET healthy = false WHERE agent_id = 'catalyst-monitor'")
+    catalogue = {a["agent_id"]: a for a in (await alice.get("/v1/pods/pod_alpha/agents")).json()}
+    router = catalogue["auto-router"]
+    assert router["health_status"] == "not_connected"
+    assert router["unavailable_reason"] == "agent_deployment_missing"
+    assert not any(router["actions"].values())
+    background = catalogue["catalyst-monitor"]
+    assert background["health_status"] == "unhealthy"
+    assert background["unavailable_reason"] == "agent_unhealthy"
+    assert not any(background["actions"].values())
+    thread = await alice.new_thread("pod_alpha")
+    denied = await alice.post(f"/v1/threads/{thread}/runs", json={"mode": "auto", "message": "NWSC"}, pod="pod_alpha")
+    assert denied.status_code == 403

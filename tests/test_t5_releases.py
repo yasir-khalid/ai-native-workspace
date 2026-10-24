@@ -20,10 +20,10 @@ async def agents(user, pod: str) -> dict[str, dict]:
 
 async def test_agent_b_pilot_alpha_only(alice, ben, dana):
     assert "filing-analyst" in await agents(alice, "pod_alpha")
-    assert "filing-analyst" not in await agents(ben, "pod_beta")
+    assert not (await agents(ben, "pod_beta"))["filing-analyst"]["actions"]["direct"]
     # Same person, two pods: availability follows the *pod*, not the user.
     assert "filing-analyst" in await agents(dana, "pod_alpha")
-    assert "filing-analyst" not in await agents(dana, "pod_beta")
+    assert not (await agents(dana, "pod_beta"))["filing-analyst"]["actions"]["direct"]
     _, ev = await ben.ask("pod_beta", "Review the HLXT 8-K filing", mode="auto")
     assert [e for e in ev if e["type"] == "agent.selected"][0]["agent_id"] == "equity-research"
 
@@ -86,7 +86,9 @@ async def test_emergency_disable_blocks_new_invocations_despite_ui_cache(alice, 
     r = await alice.post(f"/v1/threads/{t}/runs", json={"mode": "direct", "agent_id": "filing-analyst", "message": "LGS"},
                          pod="pod_alpha")
     assert r.status_code == 403 and r.json()["reason"] == "agent_emergency_disabled"
-    assert "filing-analyst" not in await agents(alice, "pod_alpha")
+    disabled = (await agents(alice, "pod_alpha"))["filing-analyst"]
+    assert disabled["unavailable_reason"] == "agent_emergency_disabled"
+    assert not any(disabled["actions"].values())
     # Capability kill switch: shared PPT renderer off for everyone, directly and through agents.
     await pat.post("/v1/admin/releases/cap.document.export.pptx/emergency", json={"disabled": True, "change_ticket": "INC-43"})
     deck = {"capability_id": "document.export.pptx", "idempotency_key": "kill-0001", "spec": {"title": "x"}}
@@ -99,17 +101,20 @@ async def test_emergency_disable_blocks_new_invocations_despite_ui_cache(alice, 
     assert "filing-analyst" in await agents(alice, "pod_alpha")
 
 
-async def test_paused_stage_and_zero_cohort_hide_agent(alice, pat):
+async def test_paused_stage_and_zero_cohort_keep_entitled_agent_visible(alice, pat):
     await patch(pat, "filing-analyst-pilot", stage="PAUSED")
-    assert "filing-analyst" not in await agents(alice, "pod_alpha")
+    unavailable = (await agents(alice, "pod_alpha"))["filing-analyst"]
+    assert not any(unavailable["actions"].values())
     await patch(pat, "filing-analyst-pilot", stage="POD_PILOT_DIRECT", user_fraction_percent=0)
-    assert "filing-analyst" not in await agents(alice, "pod_alpha")
+    unavailable = (await agents(alice, "pod_alpha"))["filing-analyst"]
+    assert not any(unavailable["actions"].values())
 
 
-async def test_flags_cannot_grant_missing_entitlement(alice, pat):
-    # Release targets a group alice does not have: release narrows only.
+async def test_release_group_restriction_keeps_entitled_agent_visible(alice, pat):
+    # Existing entitlement remains visible; release still narrows invocation.
     await patch(pat, "filing-analyst-pilot", eligible_groups=["quant_users"])
-    assert "filing-analyst" not in await agents(alice, "pod_alpha")
+    unavailable = (await agents(alice, "pod_alpha"))["filing-analyst"]
+    assert not any(unavailable["actions"].values())
 
 
 async def test_release_admin_controls_and_audit(pat, alice):

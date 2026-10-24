@@ -71,8 +71,16 @@ async def test_connect_pins_card_and_shows_external_in_catalogue(pat, alice, ben
     entry = agents["entity-intelligence"]
     assert entry["external"] is True
     assert entry["actions"]["direct"] is True and entry["healthy"] is True
-    # The release and entitlement are Alpha-only; Beta must not see the agent.
-    assert "entity-intelligence" not in [a["agent_id"] for a in (await ben.get("/v1/pods/pod_beta/agents")).json()]
+    # The research group grants an entitlement in both pods, but this release is Alpha-only.
+    # Beta can discover its entitlement without gaining invocation access.
+    beta = {a["agent_id"]: a for a in (await ben.get("/v1/pods/pod_beta/agents")).json()}
+    assert beta["entity-intelligence"]["health_status"] == "healthy"
+    assert not any(beta["entity-intelligence"]["actions"].values())
+    thread = await ben.new_thread("pod_beta")
+    denied = await ben.post(f"/v1/threads/{thread}/runs", json={
+        "mode": "direct", "agent_id": "entity-intelligence", "message": "Who owns this entity?",
+    }, pod="pod_beta")
+    assert denied.status_code == 403
 
 
 async def test_external_agent_receives_only_the_question(pat, alice, external_agent):

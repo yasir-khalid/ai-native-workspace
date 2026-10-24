@@ -11,7 +11,9 @@ import {
 import {
   Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut,
 } from "@/components/ui/command";
-import { AgentTile, PodAvatar } from "@/components/common";
+import { PodAvatar } from "@/components/common";
+import { AgentMenuDetails } from "@/components/agent-menu-details";
+import { canChatWithAgent, orderedAgents } from "@/lib/agent-availability";
 import type { CatalogueAgent, ResearchCase, ThreadSummary } from "@/lib/types";
 import { signOut, usePod } from "./session";
 import { usePodData } from "./hooks";
@@ -84,10 +86,10 @@ function Menu({ close }: { close: () => void }) {
   const router = useRouter();
   const threads = usePodData<ThreadSummary[]>(`/v1/pods/${pod}/threads`);
   const cases = usePodData<ResearchCase[]>(`/v1/pods/${pod}/research-cases`);
-  const agents = usePodData<CatalogueAgent[]>(`/v1/pods/${pod}/agents`);
+  const agents = usePodData<CatalogueAgent[]>(`/v1/pods/${pod}/agents`, { refreshInterval: 15_000 });
   const go = useCallback((href: string) => { close(); router.push(href); }, [close, router]);
   const chatWith = (agentId: string) => {
-    go(prepareAsk(pod, { agentId }));
+    go(prepareAsk(pod, agentId === "auto-router" ? {} : { agentId }));
   };
 
   return (
@@ -123,10 +125,10 @@ function Menu({ close }: { close: () => void }) {
           </CommandGroup>
         )}
         {!!agents.data?.length && (
-          <CommandGroup heading="Chat with an agent">
-            {agents.data.filter((a) => a.kind === "specialist" && a.actions.direct).map((a) => (
-              <CommandItem key={a.agent_id} value={`agent ${a.name}`} onSelect={() => chatWith(a.agent_id)}>
-                <AgentTile agentId={a.agent_id} size="sm" /> {a.name}
+          <CommandGroup heading="Your agents · live health">
+            {orderedAgents(agents.data).map((a) => (
+              <CommandItem key={a.agent_id} value={`agent ${a.name}`} keywords={[a.agent_id, a.kind]} disabled={!canChatWithAgent(a)} onSelect={() => chatWith(a.agent_id)} className="items-start gap-3 py-2.5 data-[disabled=true]:opacity-100 [&>svg:last-child]:hidden">
+                <AgentMenuDetails agent={a} />
               </CommandItem>
             ))}
           </CommandGroup>
