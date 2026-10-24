@@ -81,6 +81,18 @@ conference interview and Aurora's Evercore forum, both in 2026. They are intervi
 not a representative earnings-call corpus. Transcript Reader/Lines, search,
 chapters, consecutive-turn Q&A, insights and the global audio player are available.
 
+The listening layout uses the workspace width, a larger DM Sans transcript, a
+compact episode header and a wider chapter rail. On phones, chapter navigation is
+a selector and the player stays compact. Model/reference details remain available
+under **Transcript details** rather than occupying the primary listening controls.
+
+Sentence highlights remain stable through timing gaps. Reading never follows the
+audio automatically unless **Follow audio** is enabled; manual scrolling pauses
+following. **Jump to current** returns to the current passage without enabling
+follow. Search, chapter browsing and sentence citation IDs/times are preserved.
+The paragraph/search/tap-to-play interaction takes cues from
+[Apple Podcasts transcripts](https://support.apple.com/en-ie/127831).
+
 **Ask this call** opens the main chat with a unique draft, a question prefill and a
 composer reference. Type `@` to choose a call directly; one call may be attached
 at a time. Citation controls open an inspector beside the answer on desktop or a

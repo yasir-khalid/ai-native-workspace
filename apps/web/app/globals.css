@@ -210,3 +210,38 @@
   background: var(--secondary);
   box-shadow: none;
 }
+
+/* Listening surfaces use generous podcast typography. Playback changes paint
+   only: no font-weight, padding, line-height or animated layout changes. */
+.call-experience, .call-player {
+  font-family: var(--font-listening), ui-sans-serif, sans-serif;
+  font-feature-settings: normal;
+}
+.call-tab-strip {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.call-tab-strip::-webkit-scrollbar { display: none; }
+.call-tab-strip [data-slot="tabs-list"] { height: 52px; }
+.call-tab-strip [data-slot="tabs-trigger"] { height: 52px; }
+.call-tab-strip [data-slot="tabs-trigger"]::after { bottom: 0; }
+.transcript-prose { text-wrap: pretty; }
+.transcript-sentence {
+  display: inline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.transcript-sentence[data-active] { background: var(--accent); color: var(--foreground); }
+.transcript-sentence[data-cited] { outline: 2px solid var(--ring); outline-offset: 2px; }
+.transcript-passage::before {
+  content: "";
+  position: absolute;
+  inset: 30px auto 30px -12px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--ring);
+  opacity: 0;
+}
+.transcript-passage[data-active]::before { opacity: 1; }

@@ -40,6 +40,20 @@ by changing the ink alone.
 Typography: **Inter Variable** (`next/font`) at weights 400 / 510 / 590 / 680 with `cv01` + `ss03`
 enabled, matching Linear; Geist Mono for code.
 
+Call detail pages and the shared audio player use **DM Sans** for a softer listening
+surface. Transcript text is 16–17px with generous line height; time labels use
+tabular figures without monospace microtype. The call layout fills the available
+workspace width, with a 288–320px chapter rail at desktop sizes and a chapter
+selector on smaller screens. The rail uses the page's scroll rather than a nested
+scrollbar; the tab strip clips vertical overflow explicitly.
+
+Playback changes the highlight's paint only. The listening status reserves its
+height through gaps and speaker changes; no font weight, padding or line height
+changes with the active sentence. **Follow audio** is off by default. When enabled,
+it scrolls the document only at passage boundaries if that passage is outside the
+reading viewport. Wheel, touch and reading keys stop following. **Jump to current**,
+search results and cited passages remain explicit navigation actions.
+
 ## Contrast (WCAG 2.1)
 
 Text needs 4.5:1; non-text UI (form borders, status dots) needs 1.4.11's 3:1. Measured on the live light

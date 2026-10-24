@@ -1,5 +1,18 @@
 import type { Chapter, Paragraph, Sentence } from "./calls";
 
+/** Keep the last spoken sentence selected through timing gaps instead of
+ * clearing/re-adding the highlight and listening status between utterances. */
+export function sentenceAtTime(sentences: Sentence[], time: number): Sentence | null {
+  if (!Number.isFinite(time)) return null;
+  let low = 0, high = sentences.length - 1, found = -1;
+  while (low <= high) {
+    const middle = (low + high) >>> 1;
+    if (sentences[middle].start <= time) { found = middle; low = middle + 1; }
+    else high = middle - 1;
+  }
+  return found < 0 ? null : sentences[found];
+}
+
 export type TranscriptBlock = {
   id: string;
   speaker: string;

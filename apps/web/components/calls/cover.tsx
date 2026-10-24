@@ -16,6 +16,7 @@ const SIZES = {
   lg: "size-24 rounded-xl",
   xl: "size-48 rounded-2xl md:size-64",
   detail: "size-40 rounded-2xl md:size-64",
+  episode: "size-20 rounded-xl sm:size-36 md:size-40 xl:size-44",
 };
 
 const TICKER = {
@@ -24,6 +25,7 @@ const TICKER = {
   lg: "text-2xl px-3",
   xl: "text-5xl px-5 md:text-6xl",
   detail: "text-4xl px-4 md:text-6xl",
+  episode: "px-2 text-[20px] sm:px-3 sm:text-[36px] xl:text-[44px]",
 };
 
 const LABEL = {
@@ -32,6 +34,7 @@ const LABEL = {
   lg: "text-[9px]",
   xl: "text-[10px] md:text-[11px]",
   detail: "text-[10px] md:text-[11px]",
+  episode: "text-[7px] sm:text-[10px]",
 };
 
 function hash(value: string): number {
@@ -87,7 +90,7 @@ export function Cover({
             "repeating-linear-gradient(90deg, currentColor 0, currentColor 1px, transparent 1px, transparent 16px), repeating-linear-gradient(0deg, currentColor 0, currentColor 1px, transparent 1px, transparent 16px)",
         }}
       />
-      {label && (size === "lg" || size === "xl" || size === "detail") && (
+      {label && (size === "lg" || size === "xl" || size === "detail" || size === "episode") && (
         <span className={cn("absolute top-2 left-2.5 font-mono font-medium tracking-[0.13em] uppercase opacity-65", LABEL[size])}>
           {label}
         </span>

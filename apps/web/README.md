@@ -126,6 +126,10 @@ screenshots as a current route specification.
 - Restore completed activity and result cards from saved run events. Keep visible
   execution summaries expandable; do not describe them as private model reasoning.
 - Preserve sentence IDs and source snapshots when changing transcript presentation.
+- Call playback highlights must change paint only. Preserve the status row's height,
+  keep follow opt-in, and scroll only the document at offscreen passage boundaries.
+  Avoid `scrollIntoView` through overflow ancestors. Memoized passages should not
+  reconcile on every audio clock tick. Test timing gaps and manual-scroll takeover.
 - Source reference numbers belong to one answer, not a global namespace.
 - Early source registries resolve inline references; final cited-only snapshots
   replace them. Never label an uncited retrieved document as supporting evidence.

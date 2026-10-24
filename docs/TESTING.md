@@ -150,6 +150,27 @@ Calls and Inbox, with Monitors/Activity inside Inbox. Critical flows include:
 6. Repeat source inspection at 390px width; check sheet width and horizontal overflow.
 7. Switch pods and exercise denied access through server endpoints as well as UI.
 
+For playback stability, run `npx tsx --test tests/transcript-reader.test.ts` from
+`apps/web`, then use a prepared call in the browser. Start audio and seek across
+sentence ends, timing gaps and speaker changes with Follow audio off: document
+scroll position, toolbar height and passage geometry must stay fixed. Observe
+layout-shift entries after fonts/player load. Enable Follow audio and move to a
+passage outside the viewport: one document scroll should reveal it. Further clock
+updates within that passage must not recenter it. Wheel/touch/reading keys must
+disable following. Check explicit current/search/chapter/citation navigation,
+text selection, keyboard playback, tab overflow and responsive player controls.
+
+The 24 October reader redesign passed ten web tests, full lint/type checking and
+the production build. Browser checks kept document position, toolbar height and
+passage geometry fixed across 16 real audio sentence/gap/seek transitions, with
+zero reader layout-shift entries and no automatic document scrolls while follow
+was off. Opt-in follow scrolled once for an offscreen passage and manual scrolling
+disabled it. Search/filter/layouts, chapter navigation, keyboard sentence playback,
+seek/speed, all tabs, player continuity across navigation, cited-sentence links and
+reduced motion passed. CoreWeave and Aurora were checked, with no horizontal
+overflow at 320, 390, 768, 1024, 1280, 1440 and 1920px. The desktop chapter rail was
+320px wide with visible overflow rather than a separate scrolling viewport.
+
 `make e2e` points to the **legacy** `scripts/e2e_demo.mjs` walkthrough. It still
 references removed Agents/Admin routes and the removed cross-pod suggestion. It is
 not the current UI acceptance gate until that script is migrated. Its saved
