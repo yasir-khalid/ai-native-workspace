@@ -40,9 +40,9 @@ function Footnote() {
   );
 }
 
-function AgentRow({ agentId, active, title, desc, badge, onClick }: { agentId: string; active: boolean; title: string; desc: string; badge?: string; onClick: () => void }) {
+function AgentRow({ agentId, active, title, desc, badge, disabled, onClick }: { agentId: string; active: boolean; title: string; desc: string; badge?: string; disabled?: boolean; onClick: () => void }) {
   return (
-    <DropdownMenuItem onClick={onClick} className="items-start gap-3 rounded-md px-2.5 py-2">
+    <DropdownMenuItem disabled={disabled} onClick={onClick} className="items-start gap-3 rounded-md px-2.5 py-2">
       <AgentTile agentId={agentId} size="sm" />
       <div className="grid min-w-0 flex-1 gap-0.5">
         <span className="flex items-center gap-2 text-sm">
@@ -57,7 +57,9 @@ function AgentRow({ agentId, active, title, desc, badge, onClick }: { agentId: s
 }
 
 function AgentSwitcher({ agents, sel, setSel }: { agents: CatalogueAgent[]; sel: AskSelection; setSel: (s: AskSelection) => void }) {
-  const direct = agents.filter((a) => a.kind === "specialist" && a.actions.direct);
+  // The server already filters this catalogue by entitlement. A temporary outage
+  // disables invocation, but should not make a connected agent disappear.
+  const direct = agents.filter((a) => a.kind === "specialist" && (a.actions.direct || a.unavailable_reason === "agent_unhealthy"));
   const autoAvailable = agents.some((a) => a.agent_id === "auto-router" && a.actions.direct);
   const current = sel.mode === "auto" ? "Auto" : direct.find((a) => a.agent_id === sel.agentId)?.name ?? "Choose agent";
   return (
@@ -89,8 +91,9 @@ function AgentSwitcher({ agents, sel, setSel }: { agents: CatalogueAgent[]; sel:
               agentId={a.agent_id}
               active={sel.mode === "direct" && sel.agentId === a.agent_id}
               title={a.name}
-              desc={agentDescription(a.agent_id, a.description)}
-              badge={a.release_stage?.startsWith("POD_PILOT") ? "Preview" : undefined}
+              desc={!a.healthy ? "The connected service is offline. Availability updates automatically." : agentDescription(a.agent_id, a.description)}
+              badge={!a.healthy ? "Offline" : a.release_stage?.startsWith("POD_PILOT") ? "Preview" : undefined}
+              disabled={!a.actions.direct}
               onClick={() => setSel({ ...sel, mode: "direct", agentId: a.agent_id })}
             />
           ))}
@@ -136,7 +139,7 @@ export function AskView({ threadId, draftId, onCreated }: { threadId: string | n
   const { pod } = usePod();
   const { current: activeCall } = useCallPlayer();
   const { mutate } = useSWRConfig();
-  const agents = usePodData<CatalogueAgent[]>(`/v1/pods/${pod}/agents`);
+  const agents = usePodData<CatalogueAgent[]>(`/v1/pods/${pod}/agents`, { refreshInterval: 15_000 });
   const cases = usePodData<ResearchCase[]>(`/v1/pods/${pod}/research-cases`);
   const thread = usePodData<{ messages: StoredMessage[]; case_id: string | null; active_run: { run_id: string } | null }>(
     threadId ? `/v1/threads/${threadId}` : null,

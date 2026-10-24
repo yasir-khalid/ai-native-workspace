@@ -30,6 +30,32 @@ uses development identity/secrets unless the backend is separately configured.
 The installed Next.js version reports a security advisory; a successful build does
 not resolve it.
 
+## External agent availability
+
+External services run independently of `make dev`. Check the registered Agent Card
+URL and the pod agent catalogue before changing permissions. An entitled agent with
+`unavailable_reason: agent_unhealthy` has a connection problem. The chat picker keeps
+that agent visible as **Offline**, disables selection and refreshes every 15 seconds.
+The worker checks external health every 30 seconds; recovery can take one check plus
+one browser refresh interval. Auto routing continues to exclude unhealthy agents.
+
+The local Sportscanner demo listens on `127.0.0.1:8001`; port 8000 belongs to the
+entity-intelligence service. Its original temporary test process expired after two
+hours. On the current demo Mac it is now a user LaunchAgent named
+`uk.co.sportscanner.podos-api`, with `KeepAlive` and `RunAtLoad`. The private wrapper
+is under ignored `var/services/`; logs are `var/log/sportscanner-api.log`. It reads
+existing environment files at startup, without placing credentials in the plist.
+Local A2A authentication is disabled only on that loopback service, as in the prior
+demo configuration; hosted service authentication is unchanged.
+
+```sh
+launchctl print "gui/$(id -u)/uk.co.sportscanner.podos-api"
+# Restart the managed local service after backend changes:
+launchctl kickstart -k "gui/$(id -u)/uk.co.sportscanner.podos-api"
+```
+
+Do not start another Sportscanner process on the same port while this job is loaded.
+
 ## Run recovery
 
 ```mermaid

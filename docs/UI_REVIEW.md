@@ -162,6 +162,11 @@ Agents/Admin web screens and their screenshot affordances are historical.
 
 ## External A2A agent in the UI
 
+An entitled specialist whose service is unhealthy stays in the agent picker as a
+disabled **Offline** row. A temporary connection failure must not imply that access
+or the integration was removed. The catalogue refreshes periodically so selection
+returns when the service recovers; server authorization still decides invocation.
+
 Court availability renders through the existing OpenUI library as controlled
 shadcn cards. Dates/times, GBP prices, address/distance, freshness and **View booking**
 links are readable independently of the original prose. Long result sets and extra
