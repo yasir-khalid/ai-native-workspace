@@ -2,7 +2,7 @@
 
 > Historical source architecture. Requirements and targets below are preserved;
 > they are not a statement that every component is shipped. Read the
-> [current architecture](podos/docs/ARCHITECTURE.md) for implementation and deployment limits.
+> [current architecture](../../ARCHITECTURE.md) for implementation and deployment limits.
 > Diagrams were restyled as editable Mermaid on 24 October 2026.
 
 **Implementation-ready architecture and technical design**\

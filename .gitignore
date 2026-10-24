@@ -1,2 +1,17 @@
 .DS_Store
 **/.DS_Store
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+var/
+node_modules/
+apps/web/.next/
+# Generated per-pod data-plane credentials (dev only)
+config/data_plane.dev.json
+.env
+
+# Local OS metadata and optional model/runtime caches
+.DS_Store
+.env.*
+!.env.example

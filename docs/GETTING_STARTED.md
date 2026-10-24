@@ -2,7 +2,7 @@
 
 [Documentation](README.md) · [Configuration](CONFIGURATION.md) · [Troubleshooting](OPERATIONS.md)
 
-All commands below run from **`tmp/podos`**, the application root, unless noted.
+All commands below run from the **repository root** (`ai-native-workspace`), unless noted.
 
 ## Prerequisites
 
@@ -77,7 +77,6 @@ Tools["Docker, uv and Node"]:::interface --> Setup["make setup"]:::service
 ## First run
 
 ```sh
-cd tmp/podos                    # from this workspace's Git root
 make setup
 make dev
 ```

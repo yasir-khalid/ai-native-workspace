@@ -103,6 +103,8 @@ acceptance targets are not proof that those features currently exist.
 The [screenshots](screenshots/) record an older UI. The [evidence prototype](prototypes/transcript-evidence-inspector.html)
 is a design artifact; the working panel is in `components/ask/evidence.tsx`.
 Original Graphviz diagrams remain under `handoff/diagrams/` for reference.
+The [source handoff files](handoff/source/) retain the original document and ZIP
+archive separately from the application source at the repository root.
 
 Current implementation guides take precedence for setup and UI navigation. Dated
 research retains its original measurement policy; do not turn an experiment into
