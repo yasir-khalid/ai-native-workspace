@@ -56,10 +56,11 @@ class EntityExecutor(AgentExecutor):
         await TaskUpdater(event_queue, context.task_id, context.context_id).cancel()
 
 
-def build_app(port: int) -> Starlette:
+def build_app(port: int, *, name: str = "Mock Entity Intelligence",
+              description: str = "Answers questions about legal entities from public records (test double).") -> Starlette:
     card = AgentCard(
-        name="Mock Entity Intelligence",
-        description="Answers questions about legal entities from public records (test double).",
+        name=name,
+        description=description,
         version="0.1.0",
         supported_interfaces=[AgentInterface(url=f"http://127.0.0.1:{port}/a2a", protocol_binding="JSONRPC", protocol_version="1.0")],
         capabilities=AgentCapabilities(streaming=True),

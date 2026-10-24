@@ -141,9 +141,8 @@ class CatalystMonitorAgent(PodosAgent):
 class AutoRouterAgent(PodosAgent):
     """Picks one agent from the *pre-filtered* candidate list supplied by the platform.
 
-    It is intentionally naive about explicit "use <agent>" instructions: it will
-    propose a named agent even if it is not a candidate. The Workspace API
-    discards any proposal outside the eligible set.
+    Explicit agent names and conversation follow-ups are routing hints, not authority.
+    The Workspace API discards every proposal outside the current eligible set.
     """
 
     async def _run_async_impl(self, ctx: InvocationContext) -> AsyncGenerator[Event, None]:
@@ -151,26 +150,43 @@ class AutoRouterAgent(PodosAgent):
         candidates: list[dict[str, Any]] = route.get("candidates", [])
         question = self.user_text(ctx)
         q = question.lower()
-        explicit = re.search(r"\b(?:use|ask|route to)\s+(?:the\s+)?([a-z][a-z0-9.-]{2,63})", q)
-        if explicit and not llm.enabled():
-            yield self.event(ctx, {"type": "route.selected", "agent_id": explicit.group(1),
-                                   "rationale": "user explicitly requested this agent"})
-            return
+        explicit = re.search(r"\b(?:use|ask|check|try|switch to|route to)\s+(?:the\s+)?([a-z][a-z0-9.-]{2,63})", q)
+        if explicit and not re.search(r"\b(?:don't|do not|never)\s+(?:use|ask|check|try|switch to|route to)\b", q):
+            named = next((c["agent_id"] for c in candidates
+                          if c["agent_id"] == explicit.group(1)
+                          or c.get("name", "").lower().startswith(explicit.group(1) + " ")), None)
+            # Preserve an explicit logical ID for the API's eligibility check. Ordinary words
+            # such as 'check the latest filing' must not be mistaken for an agent name.
+            named = named or (explicit.group(1) if "-" in explicit.group(1) else None)
+            if named:
+                yield self.event(ctx, {"type": "route.selected", "agent_id": named,
+                                       "rationale": "user explicitly requested this agent"})
+                return
         if not candidates:
             yield self.event(ctx, {"type": "route.selected", "agent_id": None, "rationale": "no candidates"})
             return
         if llm.enabled():
             listing = "\n".join(f"- {c['agent_id']}: {c.get('name')}: {c.get('description')}" for c in candidates)
+            history = route.get("history", [])[-6:]
             pick = await llm.complete_json([
                 {"role": "system", "content": (
                     "You route a user's request to exactly one agent from the list provided. "
                     "Only these agents exist for this user; never name any other. "
+                    "Use recent conversation to resolve follow-ups. Prefer the agent explicitly named in the latest request. "
+                    "Sports court availability belongs to a court-finder agent when one is listed, not equity research. "
                     'Reply with JSON only: {"agent_id": "...", "rationale": "<12 words max>"}')},
-                {"role": "user", "content": f"Agents:\n{listing}\n\nRequest: {question}"},
+                {"role": "user", "content": f"Agents:\n{listing}\n\nRecent conversation: {history}\n\nLatest request: {question}"},
             ])
             if pick and isinstance(pick.get("agent_id"), str):
                 yield self.event(ctx, {"type": "route.selected", "agent_id": pick["agent_id"],
                                        "rationale": str(pick.get("rationale", ""))[:200]})
+                return
+        if re.match(r"^(?:yes[, .]+(?:please|widen|narrow|make|change|try|show|check)|(?:widen|narrow) (?:it|that))\b", q):
+            previous = next((h.get("agent_id") for h in reversed(route.get("history", []))
+                             if h.get("role") == "assistant"), None)
+            if previous in {c["agent_id"] for c in candidates}:
+                yield self.event(ctx, {"type": "route.selected", "agent_id": previous,
+                                       "rationale": "continuing the previous eligible agent's task"})
                 return
         qt = terms(question)
         filing_words = {"filing", "filings", "10-q", "10-k", "8-k", "risk factor", "risk factors", "disclosure"}

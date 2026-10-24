@@ -225,8 +225,9 @@ class _GenericStream:
             if state in {"TASK_STATE_COMPLETED", "TASK_STATE_FAILED", "TASK_STATE_CANCELED", "TASK_STATE_REJECTED",
                          "TASK_STATE_INPUT_REQUIRED", "TASK_STATE_AUTH_REQUIRED"}:
                 out += self._close_step()
-                if state == "TASK_STATE_FAILED" and text and not self.answered:
+                if text and not self.answered:
                     out.append(("delta", text))
+                    self.answered = True
                 out.append(("state", state.removeprefix("TASK_STATE_").lower()))
         elif art:
             out += self._close_step()
@@ -245,9 +246,7 @@ class _GenericStream:
         elif "task" in resp:
             for a in resp["task"].get("artifacts", []) or []:
                 out += self.feed({"artifactUpdate": {"artifact": a}})
-            state = resp["task"].get("status", {}).get("state", "")
-            if state in {"TASK_STATE_COMPLETED", "TASK_STATE_FAILED"}:
-                out.append(("state", state.removeprefix("TASK_STATE_").lower()))
+            out += self.feed({"statusUpdate": {"status": resp["task"].get("status", {})}})
         return out
 
 

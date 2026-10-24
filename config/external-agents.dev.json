@@ -24,7 +24,7 @@
       "pods": [
         "pod_alpha"
       ],
-      "stage": "POD_PILOT_DIRECT",
+      "stage": "POD_PILOT_AUTO",
       "release_key": "sportscanner-release"
     }
   ]

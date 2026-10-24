@@ -12,6 +12,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import re
 import time
 import uuid
 from collections import defaultdict, deque
@@ -34,6 +35,29 @@ log = logging.getLogger("podos.runs")
 
 ALLOWED_AGENT_EVENTS = {"tool.started", "tool.completed", "citations", "sources.available", "status"}
 FALLBACK_CODES = {"agent_unreachable", "agent_timeout", "agent_call_failed", "agent_card_mismatch", "agent_unhealthy"}
+
+
+def external_question(req: RunRequest, agent: AgentAvailability, history: list[dict]) -> str:
+    """An explicit 'ask <agent> for this' can refer to a prior user-authored question.
+
+    Never send assistant answers, documents, attached calls or case context to an external agent.
+    Standalone requests and ordinary follow-ups retain their original text and A2A context ID.
+    """
+    def is_handoff(text: str) -> bool:
+        return bool(
+            re.search(r"\b(?:use|ask|check|try|switch to|route to)\b", text, re.I)
+            and re.search(r"\b(?:this|that|previous|original|above)\b", text, re.I)
+            and any(re.search(rf"\b{re.escape(name)}\b", text, re.I)
+                    for name in (agent.agent_id, agent.agent_id.replace("-", " "), agent.name))
+        )
+
+    if req.call_id or req.research_case_id or not is_handoff(req.message):
+        return req.message
+    previous = next((h["text"] for h in reversed(history)
+                     if h["role"] == "user" and not is_handoff(h["text"])), None)
+    if not previous:
+        return req.message
+    return f"User's original request: {previous}\n\nUser's follow-up: {req.message}"
 
 
 class RateLimiter:
@@ -182,7 +206,7 @@ class RunManager:
                 candidates = [svc.gov.require_agent(ctx, snap, req.agent_id or "", "direct_invoke")]
                 routing: dict[str, Any] = {"mode": "direct", "selected": req.agent_id}
             else:
-                candidates, routing = await self._route(ctx, snap, run_id, req)
+                candidates, routing = await self._route(ctx, snap, run_id, thread_id, req)
                 if not candidates:
                     await self._fail(pod, run_id, "no_eligible_agent",
                                      "No agent is available for Auto in this pod. Choose an agent directly or contact the platform team.")
@@ -200,14 +224,16 @@ class RunManager:
             self.tool_calls.pop(run_id, None)
 
     async def _route(
-        self, ctx: PodContext, snap: Snapshot, run_id: str, req: RunRequest,
+        self, ctx: PodContext, snap: Snapshot, run_id: str, thread_id: str, req: RunRequest,
     ) -> tuple[list[AgentAvailability], dict[str, Any]]:
         svc = self.svc
         eligible = svc.gov.auto_candidates(ctx, snap)
         if not eligible:
             return [], {"mode": "auto", "eligible": []}
         router = svc.gov.require_agent(ctx, snap, "auto-router", "direct_invoke")
+        history, _, _ = await self._context_for(ctx, thread_id, req)
         payload = {
+            "history": history,
             "candidates": [
                 {"agent_id": a.agent_id, "name": a.name, "description": a.description, "capabilities": a.capabilities}
                 for a in eligible
@@ -263,7 +289,13 @@ class RunManager:
                               if s["sentence_id"] and f"[{s['sentence_id']}]" in evidence],
                 "speakers": call["transcript"].get("speakers", []),
             }
-        attempts = candidates[:2] if req.mode == "auto" else candidates[:1]
+        # Transport failure must not silently send a private research question to an external
+        # service, or replace an external specialist with an unrelated research agent.
+        primary = candidates[0]
+        platform_primary = primary.deployment and primary.deployment.trust == "platform"
+        attempts = [primary]
+        if req.mode == "auto" and platform_primary:
+            attempts += [a for a in candidates[1:] if a.deployment and a.deployment.trust == "platform"][:1]
         last_error: AgentCallError | None = None
         for idx, cand in enumerate(attempts):
             action = "direct_invoke" if req.mode == "direct" else "auto_route"
@@ -309,7 +341,7 @@ class RunManager:
             citations: list[dict[str, Any]] = []
             produced = False
             try:
-                async for kind, value in svc.a2a.stream(av.deployment, req.message, metadata,
+                async for kind, value in svc.a2a.stream(av.deployment, external_question(req, av, history) if external else req.message, metadata,
                                                         conversation_key=thread_id if external else None):
                     if kind == "delta":
                         produced = True
@@ -351,7 +383,8 @@ class RunManager:
                 case_info = dict(c) if c else None
         async with self.svc.db.system_tx() as conn:
             pod = await fetchone(conn, "SELECT display_name FROM pods WHERE pod_id = %s", (ctx.active_pod_id,))
-        history = [{"role": m["role"], "text": str(m["content"].get("text", ""))[:1500]} for m in reversed(msgs[1:])]
+        history = [{"role": m["role"], "text": str(m["content"].get("text", ""))[:1500],
+                    "agent_id": m["content"].get("agent_id")} for m in reversed(msgs[1:])]
         return history, case_info, pod["display_name"] if pod else ctx.active_pod_id
 
     async def _complete(

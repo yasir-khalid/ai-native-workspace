@@ -184,7 +184,7 @@ inspector, with an explicit **Open original** action when an HTTP(S) URL exists.
 | `sources.available` | Early per-answer source registry for streaming references |
 | Final `citations` | Used to persist the final citation snapshot on completion |
 | External verification status | Display as the external agent's own reported check |
-| Failed transport/task | Run failure or eligible fallback according to platform rules |
+| Failed transport/task | Run failure; only internal agents can fall back to another eligible internal agent |
 
 The API normalizes A2A output into its own SSE protocol. This is not a certified
 AG-UI adapter. ADK's A2A task store remains in memory; application runs/messages

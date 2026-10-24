@@ -9,9 +9,10 @@ verification). This suite drives the whole path against a real a2a-sdk agent (te
 from __future__ import annotations
 
 import pytest
-from conftest import _free_port, _Server, last, login, text_of
+from conftest import ENDPOINTS, _free_port, _Server, last, login, text_of
 
 EXT_PORT = _free_port()
+SPORT_PORT = _free_port()
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -22,8 +23,15 @@ def external_agent():
     server = _Server(mock_external_agent.build_app(EXT_PORT), EXT_PORT)
     server.start()
     server.wait()
+    sport_server = _Server(mock_external_agent.build_app(
+        SPORT_PORT, name="Sportscanner Court Finder",
+        description="Find publicly bookable badminton, squash, pickleball, padel and tennis courts in London. "
+                    "Search available sports court slots by location, date and time, with prices and booking links."), SPORT_PORT)
+    sport_server.start()
+    sport_server.wait()
     yield mock_external_agent
     server.server.should_exit = True
+    sport_server.server.should_exit = True
 
 
 async def admin_patch(pat, key: str, **changes) -> dict:
@@ -100,20 +108,24 @@ async def test_external_stream_maps_progress_answer_citations_and_verification(p
     assert cites[0]["doc_id"] is None
 
 
-async def test_sportscanner_is_visible_and_invocable_only_by_yasir(pat, external_agent):
-    """A person-specific seed grant protects both catalogue and direct API dispatch."""
+async def connect_sportscanner(pat):
     r = await pat.post("/v1/admin/agents/connect", json={
-        "url": f"http://127.0.0.1:{EXT_PORT}", "agent_id": "sportscanner",
+        "url": f"http://127.0.0.1:{SPORT_PORT}", "agent_id": "sportscanner",
         "owner_team": "Sportscanner", "change_ticket": "CHG-SPORT-1"})
     assert r.status_code == 201, r.text
     reg = r.json()
     r = await pat.patch("/v1/admin/agents/sportscanner/status",
                         json={"publication_status": "pilot", "change_ticket": "CHG-SPORT-2"})
     assert r.status_code == 200, r.text
-    await admin_patch(pat, reg["release_key"], stage="POD_PILOT_DIRECT", published=True,
+    await admin_patch(pat, reg["release_key"], stage="POD_PILOT_AUTO", published=True,
                       pod_allowlist=["pod_alpha"], eligible_groups=["research_users"],
-                      feature_flags={"catalogue_visible": True, "direct_invoke": True, "auto_route": False})
+                      feature_flags={"catalogue_visible": True, "direct_invoke": True, "auto_route": True})
 
+
+
+async def test_sportscanner_is_visible_and_invocable_only_by_yasir(pat, external_agent):
+    """A person-specific seed grant protects both catalogue and direct API dispatch."""
+    await connect_sportscanner(pat)
     yasir = await login("yasir.khalid")
     try:
         me = (await yasir.get("/v1/me")).json()
@@ -123,7 +135,7 @@ async def test_sportscanner_is_visible_and_invocable_only_by_yasir(pat, external
         agents = (await yasir.get("/v1/pods/pod_alpha/agents")).json()
         sport = next(a for a in agents if a["agent_id"] == "sportscanner")
         assert sport["external"] and sport["actions"]["direct"]
-        assert not sport["actions"]["auto"] and not sport["actions"]["background"]
+        assert sport["actions"]["auto"] and not sport["actions"]["background"]
         external_agent.RECEIVED.clear()
         _, events = await yasir.ask("pod_alpha", "Find badminton courts near E1 2AD", agent_id="sportscanner")
         assert last(events)["type"] == "run.completed"
@@ -149,3 +161,81 @@ async def test_sportscanner_is_visible_and_invocable_only_by_yasir(pat, external
             await other.http.aclose()
     # Administration does not confer research access.
     assert (await pat.get("/v1/pods/pod_alpha/agents")).status_code == 403
+
+
+async def test_auto_routes_courts_and_named_handoff_without_sending_private_answers(pat, external_agent, svc):
+    await connect_sportscanner(pat)
+    yasir = await login("yasir.khalid")
+    try:
+        question = "Um can you find pickleball slots for Wednesday near Central London?"
+        external_agent.RECEIVED.clear()
+        _, events = await yasir.ask("pod_alpha", question, mode="auto")
+        assert next(e for e in events if e["type"] == "agent.selected")["agent_id"] == "sportscanner"
+        assert external_agent.RECEIVED[0]["text"] == question
+
+        # Reproduce a conversation that was already misrouted before this fix.
+        thread = await yasir.new_thread("pod_alpha")
+        await yasir.ask("pod_alpha", question, agent_id="equity-research", thread_id=thread)
+        async with svc.db.pod_tx("pod_alpha") as conn:
+            await conn.execute(
+                """UPDATE messages SET content = jsonb_set(content, '{text}', '"PRIVATE-ANSWER-CANARY"')
+                   WHERE thread_id = %s AND role = 'assistant'""", (thread,))
+        external_agent.RECEIVED.clear()
+        _, events = await yasir.ask("pod_alpha", "Um no check the Sportscanner um agent for this",
+                                    mode="auto", thread_id=thread)
+        assert last(events)["type"] == "run.completed"
+        assert next(e for e in events if e["type"] == "agent.selected")["agent_id"] == "sportscanner"
+        sent = external_agent.RECEIVED[0]
+        assert question in sent["text"]
+        assert "PRIVATE-ANSWER-CANARY" not in str(sent)
+        assert not sent["metadata"] and not sent["request_metadata"]
+        context = sent["context_id"]
+        _, events = await yasir.ask("pod_alpha", "Yes, widen it to five miles", mode="auto", thread_id=thread)
+        assert next(e for e in events if e["type"] == "agent.selected")["agent_id"] == "sportscanner"
+        assert external_agent.RECEIVED[-1]["context_id"] == context
+        assert external_agent.RECEIVED[-1]["text"] == "Yes, widen it to five miles"
+    finally:
+        await yasir.http.aclose()
+
+
+async def test_auto_does_not_substitute_research_for_an_unreachable_external_agent(pat, svc):
+    await connect_sportscanner(pat)
+    async with svc.db.system_tx() as conn:
+        await conn.execute("UPDATE agent_deployments SET service_ref='http://127.0.0.1:9' WHERE agent_id='sportscanner'")
+    yasir = await login("yasir.khalid")
+    try:
+        _, events = await yasir.ask("pod_alpha", "Find pickleball court slots in London", mode="auto")
+        assert [e["agent_id"] for e in events if e["type"] == "agent.selected"] == ["sportscanner"]
+        assert last(events)["type"] == "run.failed"
+    finally:
+        await yasir.http.aclose()
+
+
+async def test_private_research_is_not_sent_to_external_agents_on_fallback(pat, external_agent):
+    import json
+
+    await connect_sportscanner(pat)
+    original = ENDPOINTS.read_text()
+    endpoints = json.loads(original)
+    endpoints["agent://equity-research/1.0.0"] = "http://127.0.0.1:9"
+    ENDPOINTS.write_text(json.dumps(endpoints))
+    yasir = await login("yasir.khalid")
+    external_agent.RECEIVED.clear()
+    try:
+        _, events = await yasir.ask("pod_alpha", "NWSC thesis and private target price", mode="auto")
+        assert last(events)["type"] == "run.failed"
+        assert not external_agent.RECEIVED
+    finally:
+        ENDPOINTS.write_text(original)
+        await yasir.http.aclose()
+
+
+def test_external_input_required_reply_is_rendered_without_artifact():
+    from podos_api.a2a_adapter import _GenericStream
+
+    stream = _GenericStream()
+    status = {"state": "TASK_STATE_INPUT_REQUIRED", "message": {"parts": [{"text": "Which London postcode?"}]}}
+    events = stream.feed({"statusUpdate": {"status": status}})
+    assert ("delta", "Which London postcode?") in events
+    assert ("state", "input_required") in events
+    assert not [e for e in stream.feed({"task": {"status": status}}) if e[0] == "delta"]

@@ -100,6 +100,11 @@ and any configured transport authentication. They do not receive internal pod
 research, a delegation token or the internal API URL. Attaching a call does not
 send its private transcript to an external agent. A question the user writes may
 itself contain sensitive text; the external-agent boundary does not redact it.
+For an explicit “ask this agent for this” handoff, the immediately relevant
+user-authored question can accompany the correction. Assistant answers and
+attached case/call context are excluded. Automatic transport fallback stays
+between internal agents; external failures do not fall through to an unrelated
+research agent, and research failures do not fall through to a third-party service.
 
 ## Development credentials and artifacts
 

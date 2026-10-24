@@ -118,8 +118,11 @@ sessions without deleting historical records.
 Sportscanner is connected as an external A2A agent at `http://127.0.0.1:8001`.
 Only `yasir.khalid` has its pod-scoped grant in `config/access-template.json`;
 other users cannot discover or invoke it, including by sending its ID directly.
-Select Sportscanner in the Ask composer and try “Badminton near E1 2AD tomorrow
-evening.” The separate Sportscanner service must be running. This local endpoint
+Use Auto or select Sportscanner in the Ask composer and try “Badminton near
+E1 2AD tomorrow evening.” Auto includes Sportscanner for Yasir only. A correction
+such as “check Sportscanner for this” carries the preceding user-written question
+without the research agent's answers or document evidence. The separate
+Sportscanner service must be running. This local endpoint
 currently has authentication disabled for development; shared deployments need
 a Sportscanner bearer credential configured through an agent secret reference.
 PodOS sends the question and a conversation key, without its session token,

@@ -32,11 +32,10 @@ function Welcome() {
 }
 
 function Footnote() {
-  const { info } = usePod();
   return (
     <p className="flex items-center justify-center gap-1.5 text-center text-xs text-subtle">
       <LockIcon className="size-3" />
-      Answers use only {info.display_name}&apos;s private research. Agents can make mistakes; check the sources.
+      Agents use sources available to you, including connected services. Check the sources; agents can make mistakes.
     </p>
   );
 }
